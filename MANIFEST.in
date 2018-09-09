@@ -1,0 +1,6 @@
+include COPYING
+include COPYING.LESSER
+include LICENSE 
+include INSTALL
+include README.rst
+include requirements.txt
