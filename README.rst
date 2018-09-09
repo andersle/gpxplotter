@@ -45,9 +45,11 @@ Simple example for showing a track in a map, colored by heart rate
            fig = plot_map(track, segment, zcolor='pulse')
            save_map(fig, 'test-{}.html'.format(i))
 
-.. raw:: html
 
-    <iframe src="examples/html/test-hr-map.html" height="345px" width="100%"></iframe>
+.. image:: examples/images/test-hr-map.png
+   :scale: 50 %
+   :alt: Example output
+   :align: center
 
 
 Installation
