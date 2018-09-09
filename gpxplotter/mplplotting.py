@@ -16,8 +16,6 @@ from mplleaflet.maptiles import tiles
 from gpxplotter.common import heart_rate_zone_limits, format_time_delta
 
 
-monkey_patch_tiles(tiles)
-
 ZONE_COLORS_0 = {
     1: '#ffffcc',
     2: '#a1dab4',
@@ -415,3 +413,6 @@ def plot_map_zones(track, data):
 def save_map(fig, name, tile='norgeskart_topo4'):
     """Just store a map."""
     mplleaflet.show(path=name, fig=fig, tiles=tile)
+
+
+monkey_patch_tiles(tiles)

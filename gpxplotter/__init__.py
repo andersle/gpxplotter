@@ -32,6 +32,7 @@ SOFTWARE.
 """
 import matplotlib
 from .version import VERSION as __version__
+from .gpxread import read_gpx_file
 
 
 matplotlib.use('Agg')
