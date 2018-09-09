@@ -6,12 +6,6 @@ gpxplotter
 It uses `matplotlib <http://matplotlib.org/>`_ to create some simple predefined plots and
 `mplleaflet <https://github.com/jwass/mplleaflet>`_ for making maps.
 
-Note
-----
-The intended usage is for displaying heart rate information together with
-other information. If the gpx file does not comtain heart rate information,
-the source code will have to be modified accordingly.
-
 
 Examples
 ========
@@ -64,6 +58,13 @@ Installation
 gpxplot can be installed via pip:
 
 ``pip install gpxplot``
+
+
+Note
+====
+The intended usage is for displaying heart rate information together with
+other information. If the gpx file does not comtain heart rate information,
+the source code will have to be modified accordingly.
 
 
 References
