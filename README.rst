@@ -6,9 +6,15 @@ gpxplotter
 It uses `matplotlib <http://matplotlib.org/>`_ to create some simple predefined plots and
 `mplleaflet <https://github.com/jwass/mplleaflet>`_ for making maps.
 
+Note
+----
+The intended usage is for displaying heart rate information together with
+other information. If the gpx file does not comtain heart rate information,
+the source code will have to be modified accordingly.
 
-Example
-=======
+
+Examples
+========
 
 Simple example for plotting an elevation profile with heart rate
 ----------------------------------------------------------------
