@@ -3,10 +3,15 @@ gpxplotter
 ##########
 
 ``gpxplotter`` is a Python package for reading .gpx [1]_ files and make some simple plots.
+It uses `matplotlib <http://matplotlib.org/>`_ to create some simple predefined plots and
+`mplleaflet <https://github.com/jwass/mplleaflet>`_ for making maps.
 
 
 Example
 =======
+
+Simple example for plotting an elevation profile with heart rate
+----------------------------------------------------------------
 
 .. code:: python
 
@@ -25,6 +30,24 @@ Example
    :scale: 50 %
    :alt: Example output
    :align: center
+
+Simple example for showing a track in a map, colored by heart rate
+------------------------------------------------------------------
+
+.. code:: python
+
+   from gpxplotter import read_gpx_file
+   from gpxplotter.mplplotting import plot_map, save_map
+   
+   
+   for track in read_gpx_file('test.gpx'):
+       for i, segment in enumerate(track['segments']):
+           fig = plot_map(track, segment, zcolor='pulse')
+           save_map(fig, 'test-{}.html'.format(i))
+
+.. raw:: html
+
+    <iframe src="examples/html/test-hr-map.html" height="345px" width="100%"></iframe>
 
 
 Installation
