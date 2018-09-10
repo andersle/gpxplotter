@@ -2,8 +2,6 @@
 # Copyright (c) 2018, Anders Lervik.
 # Distributed under the LGPLv2.1+ License. See LICENSE for more info.
 """This module defines common methods for gpxplotter."""
-from math import floor
-import numpy as np
 
 
 def heart_rate_zones(pulse, maxpulse=187):
@@ -30,7 +28,7 @@ def heart_rate_zones(pulse, maxpulse=187):
     zone = 10.0 * frac - 4.0
     if zone < 1:
         zone = 1
-    return zone, floor(zone), frac
+    return zone, int(zone), frac
 
 
 def heart_rate_zone_limits(maxpulse=187):
