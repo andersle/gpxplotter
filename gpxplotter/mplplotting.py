@@ -115,7 +115,7 @@ def plot_elevation_hr(track, data):
     for i in data['hr-regions']:
         xpos = xdata[i[0]:i[1]+1]
         ypos = ydata[i[0]:i[1]+1]
-        idx = 0 if i[2] < 2 else 1
+        idx = 0 if i[2] < 3 else 1
         ax1.fill_between(xpos, 0, ypos, alpha=1.0,
                          color=ZONE_COLORS[idx])
     patch = mpatches.Patch(color=ZONE_COLORS[0])
@@ -151,7 +151,7 @@ def plot_elevation_hr_dist(track, data):
     for i in data['hr-regions']:
         xpos = xdata[i[0]:i[1]+1]
         ypos = ydata[i[0]:i[1]+1]
-        idx = 0 if i[2] < 2 else 1
+        idx = 0 if i[2] < 3 else 1
         ax1.fill_between(xpos, 0, ypos, alpha=1.0,
                          color=ZONE_COLORS[idx])
     patch = mpatches.Patch(color=ZONE_COLORS[0])
