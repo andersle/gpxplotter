@@ -140,8 +140,22 @@ def get_point_data(point):
     return lat, lon, ele, time, pulse
 
 
-def read_segment(segment):
-    """Read points in a segment and return data for plotting."""
+def read_segment(segment, maxpulse=187):
+    """Read points in a segment and return data for plotting.
+
+    Parameters
+    ----------
+    segment : object like :py:class:`xml.dom.minidom.Element`
+        The sement we are about to read data from.
+    maxpulse : integer
+        The maximum heart rate to use in calculations of heart rate zones.
+
+    Returns
+    -------
+    out : dict
+        The data read from the segment.
+
+    """
     points = segment.getElementsByTagName('trkpt')
     lat, lon, ele, time, pulse = [], [], [], [], []
     for point in points:
@@ -160,7 +174,7 @@ def read_segment(segment):
         'time-delta': time_delta,
         'pulse': np.array(pulse, dtype=np.int_),
     }
-    hrzone = [heart_rate_zones(i) for i in pulse]
+    hrzone = [heart_rate_zones(i, maxpulse=maxpulse) for i in pulse]
     data['hr-zone'] = np.array([i[1] for i in hrzone], dtype=np.int_)
     data['hr-zone-float'] = np.array([i[0] for i in hrzone])
     data['hr-zone-frac'] = np.array([i[2] for i in hrzone])
@@ -189,17 +203,6 @@ def find_regions(yval):
             reg = [regions[i-1][0], region[0], region[1]]
         new_regions.append(reg)
     return new_regions
-
-
-def format_time_delta(time_delta):
-    """Create string after formatting time deltas."""
-    timel = []
-    for i in time_delta:
-        hours, res = divmod(i, 3600)
-        minutes, seconds = divmod(res, 60)
-        timel.append('{:02d}:{:02d}:{:02d}'.format(int(hours), int(minutes),
-                                                   int(seconds)))
-    return timel
 
 
 def get_distances(lat, lon):
@@ -241,13 +244,15 @@ def _get_gpx_text(track, tagname):
     return tag_txt
 
 
-def read_gpx_file(gpxfile):
+def read_gpx_file(gpxfile, maxpulse=187):
     """Read data from a given gpx file.
 
     Parameters
     ----------
     gpxfile : string
         The file to open and read.
+    maxpulse : integer
+        The maximum pulse. Used in calculation of heat rate zones.
 
     Yields
     ------
@@ -263,7 +268,7 @@ def read_gpx_file(gpxfile):
         track_data = {
             'name': _get_gpx_text(track, 'name'),
             'type': _get_gpx_text(track, 'type'),
-            'segments': [read_segment(i) for i in segments],
+            'segments': [read_segment(i, maxpulse=maxpulse) for i in segments],
         }
         # Add some more processed data for segments
         for data in track_data['segments']:

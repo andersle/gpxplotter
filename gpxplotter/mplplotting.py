@@ -280,7 +280,7 @@ def plot_elevation_hr_multi_dist(track, data):
     return fig
 
 
-def plot_hr(data):
+def plot_hr(data, maxpulse=187):
     """Plot the elevation profile with heart rate annotations."""
     fig = plt.figure()
     ax1 = fig.add_subplot(111)
@@ -289,7 +289,7 @@ def plot_hr(data):
     ydata = data['pulse']
     handles = []
     legends = []
-    zones = heart_rate_zone_limits()
+    zones = heart_rate_zone_limits(maxpulse=maxpulse)
     for i, zone in enumerate(zones):
         patch = mpatches.Patch(color=ZONE_COLORS_0[i+1])
         legend = 'Zone = {}'.format(i + 1)
@@ -314,7 +314,6 @@ def plot_hr_time(data):
     ax1 = fig.add_subplot(111)
     ax1.set_facecolor('0.90')
     xdata = data['delta-seconds']
-    #ax1.plot(xdata, ydata, color='#262626', lw=3)
     handles = []
     legends = []
     zones = {i + 1: 0 for i in range(5)}

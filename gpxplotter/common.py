@@ -26,8 +26,10 @@ def heart_rate_zones(pulse, maxpulse=187):
     """
     frac = float(pulse) / float(maxpulse)
     zone = 10.0 * frac - 4.0
-    if zone < 1:
-        zone = 1
+    if zone < 1.0:
+        zone = 1.0
+    if zone > 5.0:
+        zone = 5.0
     return zone, int(zone), frac
 
 
