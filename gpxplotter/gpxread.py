@@ -59,11 +59,16 @@ def vincenty(point1, point2, tol=10**-12, maxitr=1000):
             (cos2 * sin(lambd))**2 +
             (cos1 * sin2 - sin1 * cos2 * cos(lambd))**2
         )
+        if sin_sigma == 0.0:
+            return 0.0
         cos_sigma = sin1 * sin2 + cos1 * cos2 * cos(lambd)
         sigma = atan2(sin_sigma, cos_sigma)
         sin_alpha = (cos1 * cos2 * sin(lambd)) / sin_sigma
         cos_alpha_sq = 1.0 - sin_alpha**2
-        cos_sigma2 = cos_sigma - ((2.0 * sin1 * sin2) / cos_alpha_sq)
+        if cos_alpha_sq == 0.0:
+            cos_sigma2 = 0.0
+        else:
+            cos_sigma2 = cos_sigma - ((2.0 * sin1 * sin2) / cos_alpha_sq)
         cvar = ((flattening / 16.) * cos_alpha_sq *
                 (4.0 + flattening * (4.0 - 3.0 * cos_alpha_sq)))
         lambd0 = lambd
@@ -113,8 +118,7 @@ def extract_data(point, key, formatter):
     """
     data = point.getElementsByTagName(key)
     for i in data:
-        stuff = [formatter(child.data) for child in i.childNodes]
-    return stuff
+        return [formatter(child.data) for child in i.childNodes]
 
 
 def get_point_data(point):
@@ -137,6 +141,12 @@ def get_point_data(point):
 
     time = extract_data(point, 'time', date_format)
     pulse = extract_data(point, 'ns3:hr', float)
+    for i, key in zip((ele, time, pulse), ('elevation', 'time', 'heart-rate')):
+        if i is None:
+            # Give a warning:
+            print('Could not read "{}" from data point.'.format(key))
+            print('XML was:')
+            print('{}'.format(point.toxml()))
     return lat, lon, ele, time, pulse
 
 
@@ -160,6 +170,8 @@ def read_segment(segment, maxpulse=187):
     lat, lon, ele, time, pulse = [], [], [], [], []
     for point in points:
         data = get_point_data(point)
+        if any([i is None for i in data]):
+            continue
         lat.append(data[0])
         lon.append(data[1])
         ele.extend(data[2])
