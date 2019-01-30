@@ -136,7 +136,7 @@ def get_point_data(point):
 
     def date_format(string):
         """Conversions for date strings."""
-        timeobj = datetime.strptime(string, '%Y-%m-%dT%H:%M:%S.%f%z')
+        timeobj = datetime.strptime(string, '%Y-%m-%dT%H:%M:%S.%fZ')
         return timeobj
 
     time = extract_data(point, 'time', date_format)
