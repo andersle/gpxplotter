@@ -102,7 +102,11 @@ def _make_time_labels(delta_seconds, nlab=5):
 
 
 def plot_elevation_hr(track, data):
-    """Plot the elevation profile with heart rate annotations."""
+    """Plot the elevation profile with heart rate annotations.
+
+    This will plot as a function of time.
+
+    """
     fig = plt.figure()
     ax1 = fig.add_subplot(111)
     ax1.set_title('{}: {}'.format(track['name'][0], track['type'][0]))
@@ -138,7 +142,11 @@ def plot_elevation_hr(track, data):
 
 
 def plot_elevation_hr_dist(track, data):
-    """Plot the elevation profile with heart rate annotations."""
+    """Plot the elevation profile with heart rate annotations.
+
+    This will plot as a function of distance.
+
+    """
     fig = plt.figure()
     ax1 = fig.add_subplot(111)
     ax1.set_title('{}: {}'.format(track['name'][0], track['type'][0]))
@@ -171,7 +179,7 @@ def plot_elevation_hr_dist(track, data):
 
 
 def plot_elevation_hrz(track, data):
-    """Plot the elevation profile with heart rate annotations."""
+    """Plot the elevation profile with heart rate zones."""
     fig = plt.figure()
     ax1 = fig.add_subplot(111)
     ax1.set_facecolor('0.90')
@@ -203,7 +211,7 @@ def plot_elevation_hrz(track, data):
 
 
 def plot_elevation_hrz_dist(track, data):
-    """Plot the elevation profile with heart rate annotations."""
+    """Plot the elevation profile with heart rate zones."""
     fig = plt.figure()
     ax1 = fig.add_subplot(111)
     ax1.set_facecolor('0.90')
@@ -355,8 +363,7 @@ def monkey_patch_tiles(mpltiles):
             'layers=topo4&zoom={z}&x={x}&y={y}'
         ),
         (
-            'Copyright: Kartverket - see http://www.statkart.no/nor/Land/'
-            'Kart_og_produkter/visningstjenester/'
+            '<a href="http://www.kartverket.no">Kartverket</a>'
         )
     )
     mpltiles['norgeskart_toporaster3'] = (
@@ -365,8 +372,7 @@ def monkey_patch_tiles(mpltiles):
             'layers=toporaster3&zoom={z}&x={x}&y={y}'
         ),
         (
-            'Copyright: Kartverket - see http://www.statkart.no/nor/Land/'
-            'Kart_og_produkter/visningstjenester/'
+            '<a href="http://www.kartverket.no">Kartverket</a>'
         ),
     )
 
