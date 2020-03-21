@@ -3,8 +3,8 @@
 # Distributed under the LGPLv2.1+ License. See LICENSE for more info.
 """This module defines methods for reading data from GPX files."""
 from xml.dom import minidom
-from datetime import datetime
 from math import atan, atan2, radians, tan, sin, cos, sqrt
+import dateutil.parser
 import numpy as np
 from gpxplotter.common import heart_rate_zones
 
@@ -136,7 +136,7 @@ def get_point_data(point):
 
     def date_format(string):
         """Conversions for date strings."""
-        timeobj = datetime.strptime(string, '%Y-%m-%dT%H:%M:%S.%fZ')
+        timeobj = dateutil.parser.parse(string)
         return timeobj
 
     time = extract_data(point, 'time', date_format)
