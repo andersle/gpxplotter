@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2018, Anders Lervik.
+# Copyright (c) 2020, Anders Lervik.
 # Distributed under the LGPLv2.1+ License. See LICENSE for more info.
 """This module defines methods for reading data from GPX files."""
 from xml.dom import minidom

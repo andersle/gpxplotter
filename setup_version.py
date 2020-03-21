@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2018, Anders Lervik.
+# Copyright (c) 2020, Anders Lervik.
 # Distributed under the LGPLv2.1+ License. See LICENSE for more info.
 """
 gpxplotter - A library for reading GPX files and make some simple plots.
-Copyright (C) 2018, Anders Lervik.
+Copyright (C) 2020, Anders Lervik.
 
 This file only generates the verison info.
 """
@@ -23,7 +23,7 @@ else:
     VERSION = '{:d}.{:d}.{:d}'.format(MAJOR, MINOR, MICRO)
 VERSION_FILE = os.path.join('gpxplotter', 'version.py')
 VERSION_TXT = '''# -*- coding: utf-8 -*-
-# Copyright (c) 2018, Anders Lervik.
+# Copyright (c) 2020, Anders Lervik.
 # Distributed under the LGPLv2.1+ License. See LICENSE for more info.
 """Version information for gpxplotter.
 
