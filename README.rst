@@ -55,9 +55,9 @@ Simple example for showing a track in a map, colored by heart rate
 Installation
 ============
 
-gpxplot can be installed via pip:
+gpxplotter can be installed via pip:
 
-``pip install gpxplot``
+``pip install gpxplotter``
 
 
 Note
