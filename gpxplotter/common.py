@@ -4,6 +4,10 @@
 """This module defines common methods for gpxplotter."""
 
 
+# Define heart-rate limits:
+HR_LIMITS = [(0.5, 0.6), (0.6, 0.7), (0.7, 0.8), (0.8, 0.9), (0.9, 1.0)]
+
+
 def heart_rate_zones(pulse, maxpulse=187):
     """Calculate heart rate zones.
 
@@ -33,9 +37,8 @@ def heart_rate_zones(pulse, maxpulse=187):
     return zone, int(zone), frac
 
 
-def heart_rate_zone_limits(maxpulse=187):
+def heart_rate_zone_limits(maxpulse=187, lims=HR_LIMITS):
     """Return the limits for the heart rate zones."""
-    lims = [(0.5, 0.6), (0.6, 0.7), (0.7, 0.8), (0.8, 0.9), (0.9, 1.0)]
     return [(maxpulse * i[0], maxpulse * i[1]) for i in lims]
 
 
