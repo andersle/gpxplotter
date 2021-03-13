@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2020, Anders Lervik.
+# Copyright (c) 2021, Anders Lervik.
 # Distributed under the LGPLv2.1+ License. See LICENSE for more info.
 """
 gpxplotter - A library for reading gpx files and making some simple plots.
-Copyright (C) 2020, Anders Lervik.
+Copyright (C) 2021, Anders Lervik.
 
 This file is part of gpxplotter.
 
@@ -78,8 +78,8 @@ setup(
         'Operating System :: MacOS :: MacOS X',
         'Operating System :: POSIX',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
         'Topic :: Other/Nonlisted Topic',
     ],
     keywords='gpx gps',

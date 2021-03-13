@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2020, Anders Lervik.
+# Copyright (c) 2021, Anders Lervik.
 # Distributed under the LGPLv2.1+ License. See LICENSE for more info.
 """This module defines methods for plotting GPX data using matplotlib."""
 from math import floor, ceil
@@ -11,8 +11,6 @@ from matplotlib.colorbar import ColorbarBase
 import matplotlib.patches as mpatches
 from matplotlib import gridspec
 from matplotlib import pyplot as plt
-import mplleaflet
-from mplleaflet.maptiles import tiles
 from gpxplotter.common import heart_rate_zone_limits, format_time_delta
 
 
@@ -417,7 +415,8 @@ def plot_map_zones(track, data):
 
 def save_map(fig, name, tile='norgeskart_topo4'):
     """Just store a map."""
-    mplleaflet.show(path=name, fig=fig, tiles=tile)
+    pass
+    #mplleaflet.show(path=name, fig=fig, tiles=tile)
 
 
-monkey_patch_tiles(tiles)
+#monkey_patch_tiles(tiles)
