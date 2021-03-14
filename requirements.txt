@@ -2,3 +2,5 @@ numpy
 matplotlib
 folium
 python-dateutil
+jinja2
+branca

@@ -10,7 +10,7 @@ from matplotlib.cm import get_cmap
 from matplotlib.colors import Normalize
 import matplotlib.patches as mpatches
 from matplotlib import pyplot as plt
-from gpxplotter.common import format_time_delta
+from gpxplotter.common import format_time_delta, RELABEL
 
 
 ZONE_COLORS_0 = {
@@ -30,16 +30,6 @@ ZONE_COLORS_1 = {
 ZONE_COLORS = {
     0: '#bcbddc',
     1: '#9e9ac8',
-}
-
-
-RELABEL = {
-    'hr': 'Heart rate / bpm',
-    'distance': 'Distance / m',
-    'time': 'Time',
-    'elevation': 'Elevation / m',
-    'hr-zone-frac': 'Fraction of maximum heart rate',
-    'hr-zone-float': 'Heart rate zone',
 }
 
 
@@ -180,7 +170,7 @@ def add_regions(axi, xdata, ydata, regions, cut):
             idx = 0 if i[2] <= cut else 1
             axi.fill_between(
                 xpos,
-                0,
+                min(ydata),
                 ypos,
                 alpha=1.0,
                 color=ZONE_COLORS[idx]

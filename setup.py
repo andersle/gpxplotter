@@ -21,39 +21,46 @@ You should have received a copy of the GNU Lesser General Public License
 along with gpxplotter. If not, see <http://www.gnu.org/licenses/>
 """
 import ast
-from codecs import open as openc
-import os
+import pathlib
 from setuptools import setup, find_packages
 
 
+GITHUB = 'https://github.com/andersle/gpxplotter'
+DOCS = 'https://gpxplotter.readthedocs.io/en/latest'
+
+FULL_VERSION = '0.1.0.dev0'  # Automatically set by setup_version.py
+
 def get_long_description():
-    """Return the contents of README.rst"""
-    here = os.path.abspath(os.path.dirname(__file__))
-    # Get the long description from the README file
-    long_description = ''
-    with openc(os.path.join(here, 'README.rst'), encoding='utf-8') as fileh:
-        long_description = fileh.read()
-    return long_description
+    """Hard-coded long description."""
+    long_description = (
+        'gpxplotter is a small package for generating '
+        '.gpx files and creating simple using '
+        '`matplotlib <https://www.matplotlib.org/>`_ and simple maps '
+        'using `folium <https://python-visualization.github.io/folium/>`_. '
+        'The gpxplotter documentation can be found at `{docs} <{docs}>`_'
+        ' and the source code is hosted at `{github} <{github}>`_.'
+    )
+    return long_description.format(docs=DOCS, github=GITHUB)
 
 
 def get_version():
-    """Read the version from version.py"""
-    here = os.path.abspath(os.path.dirname(__file__))
-    filename = os.path.join(here, 'gpxplotter', 'version.py')
-    with openc(filename, encoding='utf-8') as fileh:
+    """Return the version from version.py as a string."""
+    here = pathlib.Path(__file__).absolute().parent
+    filename = here.joinpath('gpxplotter', 'version.py')
+    with open(filename, 'r') as fileh:
         for lines in fileh:
             if lines.startswith('FULL_VERSION ='):
                 version = ast.literal_eval(lines.split('=')[1].strip())
                 return version
-    return 'unknown'
+    return FULL_VERSION
 
 
 def get_requirements():
-    """Read requirements.txt"""
-    here = os.path.abspath(os.path.dirname(__file__))
+    """Read requirements.txt and return a list of requirements."""
+    here = pathlib.Path(__file__).absolute().parent
     requirements = []
-    filename = os.path.join(here, 'requirements.txt')
-    with openc(filename, encoding='utf-8') as fileh:
+    filename = here.joinpath('requirements.txt')
+    with open(filename, 'r') as fileh:
         for lines in fileh:
             requirements.append(lines.strip())
     return requirements
@@ -62,9 +69,9 @@ def get_requirements():
 setup(
     name='gpxplotter',
     version=get_version(),
-    description='A package for reading gpx files and make some simple plots',
+    description='A package for reading gpx files and creating simple plots',
     long_description=get_long_description(),
-    url='https://github.com/andersle/gpxplotter',
+    url=GITHUB,
     author='Anders Lervik',
     author_email='andersle@gmail.com',
     license='LGPLv2.1+',

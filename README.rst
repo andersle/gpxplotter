@@ -4,7 +4,7 @@ gpxplotter
 
 ``gpxplotter`` is a Python package for reading .gpx [1]_ files and make some simple plots.
 It uses `matplotlib <http://matplotlib.org/>`_ to create some simple predefined plots and
-`mplleaflet <https://github.com/jwass/mplleaflet>`_ for making maps.
+`folium <https://python-visualization.github.io/folium/>`_ for making maps.
 
 
 Examples
@@ -63,8 +63,7 @@ gpxplotter can be installed via pip:
 Note
 ====
 The intended usage is for displaying heart rate information together with
-other information. If the gpx file does not comtain heart rate information,
-the source code will have to be modified accordingly.
+other information (e.g. elevation and time). 
 
 
 References
