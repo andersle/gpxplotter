@@ -111,11 +111,11 @@ def add_colorbar(figi, axi, patch, zvar, norm):
 
     Parameters
     ----------
-    figi: object like matplotlib.figure.Figure
+    figi: object like :py:class:`matplotlib.figure.Figure`
         The figure to add the color bar to.
-    axi : object like matplotlib.axes.Axes
+    axi : object like :py:class:`matplotlib.axes.Axes`
         The axes to which we add the color bar next to.
-    patch : object like matplotlib.cm.ScalarMappable
+    patch : object like :py:class:`matplotlib.cm.ScalarMappable`
         The mappable described by the color bar.
     zvar : string
         The variable we are using for coloring.
@@ -138,11 +138,11 @@ def add_regions(axi, xdata, ydata, regions, cut):
 
     Parameters
     ----------
-    axi : object like matplotlib.axes.Axes
+    axi : object like :py:class:`matplotlib.axes.Axes`
         The axes to add regions to.
-    xdata : object like numpy.array
+    xdata : object like :py:class:`numpy.array`
         The x-values we are plotting for.
-    ydata : object like numpy.array
+    ydata : object like :py:class:`numpy.array`
         The y-values we are plotting for.
     regions : list of lists
         regions[i] defines a heart rate region as [start, stop, hr-region].
@@ -218,18 +218,18 @@ def add_segmented_line(xdata, ydata, zdata, cmap='viridis'):
 
     Parameters
     ----------
-    xdata : object like numpy.array
+    xdata : object like :py:class:`numpy.array`
         x-positions to use.
-    ydata : object like numpy.array
+    ydata : object like :py:class:`numpy.array`
         y-positions to use.
-    zdata : object like numpy.array
+    zdata : object like :py:class:`numpy.array`
         Values to use for coloring the line segments.
     cmap : string, optional
         Colormap to use for the colors.
 
     Returns
     -------
-    out : object like matplotlib.collections.LineCollection
+    out : object like :py:class:`matplotlib.collections.LineCollection`
         The multicolored lines.
 
     Note
@@ -252,9 +252,9 @@ def _update_limits(axi, data, which='x', factor=0.025):
 
     Parameters
     ----------
-    axi : object like matplotlib.axes.Axes
+    axi : object like :py:class:`matplotlib.axes.Axes`
         The axes to update for.
-    data : object like numpy.array
+    data : object like :py:class:`numpy.array`
         The data we are plotting on the given axes.
     which : string, optional
         Determines if we are updating the x or y-axes.
@@ -282,9 +282,9 @@ def _add_elapsed_labels(axi, data, which='x'):
 
     Parameters
     ----------
-    axi : object like matplotlib.axes.Axes
+    axi : object like :py:class:`matplotlib.axes.Axes`
         The axes to add ticks for.
-    data : object like numpy.array
+    data : object like :py:class:`numpy.array`
         The data we are updating.
     which : string, optional
         Selects the axes (x or y) we are updating.
@@ -308,9 +308,9 @@ def _shift_elapsed_labels(axi, start_time, which='x'):
 
     Parameters
     ----------
-    axi : object like matplotlib.axes.Axes
+    axi : object like :py:class:`matplotlib.axes.Axes`
         The axes to add ticks for.
-    start_time : object like datetime.datetime
+    start_time : object like :py:class:`datetime.datetime`
         The starting time to use for shifting.
     which : string, optional
         Selects the axes (x or y) we are updating.
@@ -356,7 +356,7 @@ def plot_line(track, data, xvar='distance', yvar='elevation', zvar=None,
 
     Returns
     -------
-    fig: object like matplotlib.figure.Figure
+    fig: object like :py:class:`matplotlib.figure.Figure`
         The figure created here.
 
     """
@@ -426,7 +426,7 @@ def plot_filled(track, data, xvar='distance', yvar='elevation', zvar='hr',
 
     Returns
     -------
-    fig: object like matplotlib.figure.Figure
+    fig: object like :py:class:`matplotlib.figure.Figure`
         The figure created here.
 
     """
@@ -454,3 +454,4 @@ def plot_filled(track, data, xvar='distance', yvar='elevation', zvar='hr',
         _add_elapsed_labels(ax1, xdata, which='x')
     if yvar == 'elapsed-time':
         _add_elapsed_labels(ax1, ydata, which='y')
+    return fig

@@ -4,3 +4,6 @@ folium
 python-dateutil
 jinja2
 branca
+sphinx
+sphinx_rtd_theme
+sphinx-gallery
