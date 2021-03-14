@@ -47,11 +47,6 @@ Simple example for showing a track in a map, colored by heart rate
    the_map.save('test.html')
 
 
-.. raw:: html
-
-   <iframe src="examples/python/test.html" height="500px" width="100%"></iframe>
-
-
 
 
 Installation
