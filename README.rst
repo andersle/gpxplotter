@@ -46,6 +46,7 @@ Simple example for showing a track in a map, colored by heart rate
            add_segment_to_map(the_map, segment, color_by='hr')
    the_map.save('test.html')
 
+
 .. raw:: html
 
    <iframe src="examples/python/test.html" height="500px" width="100%"></iframe>
