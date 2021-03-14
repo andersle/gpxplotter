@@ -30,6 +30,7 @@ DOCS = 'https://gpxplotter.readthedocs.io/en/latest'
 
 FULL_VERSION = '0.1.0.dev0'  # Automatically set by setup_version.py
 
+
 def get_long_description():
     """Hard-coded long description."""
     long_description = (

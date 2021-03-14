@@ -115,12 +115,13 @@ def get_version_info(version):
     elif pathlib.Path(VERSION_FILE).is_file():
         try:
             from gpxplotter.version import git_revision
-        except ImportError:
-            raise ImportError(
+        except ImportError as error:
+            msg = (
                 'Unable to import git_revision. Try removing '
                 'gpxplotter/version.py and the build directory '
                 'before building.'
             )
+            raise Exception(msg) from error
     else:
         git_revision = 'Unknown'
     if not version['release']:
@@ -150,7 +151,7 @@ def write_version_py(version):
     Returns
     -------
     full_version : string
-        The current full version for gpxplotter. 
+        The current full version for gpxplotter.
 
     """
     full_version, git_revision, git_version = get_version_info(version)
