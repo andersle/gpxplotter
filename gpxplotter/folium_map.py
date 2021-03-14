@@ -6,6 +6,8 @@ import folium
 import folium.features
 import branca.colormap
 import numpy as np
+from gpxplotter.common import RELABEL
+
 
 TILES = [
     {
@@ -31,7 +33,7 @@ TILES = [
 ]
 
 
-def create_folium_map(tiles=TILES):
+def create_folium_map(tiles=None):
     """Create a folium map.
 
     Returns
@@ -44,26 +46,29 @@ def create_folium_map(tiles=TILES):
         location=['63.446827', 10.421906],
         tiles=None,
         zoom_start=11,
-        control_scale = True,
+        control_scale=True,
     )
+    folium.TileLayer('openstreetmap').add_to(the_map)
+    if tiles is None:
+        tiles = TILES
     for tile in tiles:
         folium.TileLayer(
             tile['url'], attr=tile['attr'], name=tile['name']
         ).add_to(the_map)
-    folium.TileLayer('openstreetmap').add_to(the_map)
     folium.TileLayer('stamenterrain').add_to(the_map)
     folium.LayerControl().add_to(the_map)
     return the_map
 
 
 def add_segment_to_map(the_map, segment, color_by=None, line_options=None):
+    """Add a segment as a line to a map."""
     if color_by is None:
         if line_options is None:
             line_options = {}
         line = folium.features.PolyLine(segment['latlon'], **line_options)
         line.add_to(the_map)
     else:
-        pass
+        add_colored_line(the_map, segment, color_by)
     start = folium.Marker(
         location=segment['latlon'][0],
         tooltip='Start',
@@ -78,3 +83,18 @@ def add_segment_to_map(the_map, segment, color_by=None, line_options=None):
     stop.add_to(the_map)
     the_map.location = list(np.mean(segment['latlon'], axis=0))
     the_map.options['zoom'] = 15
+
+
+def add_colored_line(the_map, segment, color_by, line_options=None):
+    """Add segment as a colored line to a map."""
+    zdata = segment[color_by]
+    avg = 0.5 * (zdata[1:] + zdata[:-1])
+    minz, maxz = min(avg), max(avg)
+    colormap = branca.colormap.linear.viridis.scale(minz, maxz).to_step(10)
+    colormap.caption = RELABEL.get(color_by, color_by)
+    if line_options is None:
+        line_options = {}
+    line = folium.ColorLine(positions=segment['latlon'], colormap=colormap,
+                            colors=avg, control=False, **line_options)
+    line.add_to(the_map)
+    the_map.add_child(colormap)
