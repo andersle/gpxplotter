@@ -33,6 +33,4 @@ SOFTWARE.
 import matplotlib
 from .version import VERSION as __version__
 from .gpxread import read_gpx_file
-
-
-matplotlib.use('Agg')
+from .folium_map import create_folium_map, add_segment_to_map

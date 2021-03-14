@@ -9,6 +9,20 @@ import numpy as np
 from gpxplotter.common import heart_rate_zones
 
 
+def date_format(string):
+    """Conversions for date strings."""
+    timeobj = dateutil.parser.parse(string)
+    return timeobj
+
+
+EXTRACT = {
+    'time': {'key': 'time', 'formatter': date_format},
+    'temp': {'key': 'ns3:atemp', 'formatter': float},
+    'hr': {'key': 'ns3:hr', 'formatter': float},
+    'cad': {'key': 'ns3:cad', 'formatter': float},
+}
+
+
 def vincenty(point1, point2, tol=10**-12, maxitr=1000):
     """Calculate distance between two lat/lon coordinates.
 
@@ -130,24 +144,22 @@ def get_point_data(point):
         The point on the track we are extracting information from.
 
     """
-    lat = float(point.getAttribute('lat'))
-    lon = float(point.getAttribute('lon'))
+
+    data = {
+        'lat': float(point.getAttribute('lat')),
+        'lon': float(point.getAttribute('lon')),
+    }
+
     ele = extract_data(point, 'ele', float)
+    if ele is not None:
+        data['elevation'] = ele
 
-    def date_format(string):
-        """Conversions for date strings."""
-        timeobj = dateutil.parser.parse(string)
-        return timeobj
+    for key, val in EXTRACT.items():
+        value = extract_data(point, val['key'], val['formatter'])
+        if value is not None:
+            data[key] = value
 
-    time = extract_data(point, 'time', date_format)
-    pulse = extract_data(point, 'ns3:hr', float)
-    for i, key in zip((ele, time, pulse), ('elevation', 'time', 'heart-rate')):
-        if i is None:
-            # Give a warning:
-            print('Could not read "{}" from data point.'.format(key))
-            print('XML was:')
-            print('{}'.format(point.toxml()))
-    return lat, lon, ele, time, pulse
+    return data
 
 
 def read_segment(segment, maxpulse=187):
@@ -167,26 +179,31 @@ def read_segment(segment, maxpulse=187):
 
     """
     points = segment.getElementsByTagName('trkpt')
-    lat, lon, ele, time, pulse = [], [], [], [], []
+
+    data = {}
     for point in points:
-        data = get_point_data(point)
+        point_data = get_point_data(point)
         if any([i is None for i in data]):
             continue
-        lat.append(data[0])
-        lon.append(data[1])
-        ele.extend(data[2])
-        time.extend(data[3])
-        pulse.extend(data[4])
-    time_delta = [i - time[0] for i in time]
-    data = {
-        'lat': np.array(lat),
-        'lon': np.array(lon),
-        'ele': np.array(ele),
-        'time': time,
-        'time-delta': time_delta,
-        'pulse': np.array(pulse, dtype=np.int_),
-    }
-    hrzone = [heart_rate_zones(i, maxpulse=maxpulse) for i in pulse]
+        for key, val in point_data.items():
+            if key not in data:
+                data[key] = []
+            try:
+                data[key].extend(val)
+            except TypeError:
+                data[key].append(val)
+    for key, val in data.items():
+        if key not in ('time', 'hr'):
+            data[key] = np.array(val)
+    if 'time' in data:
+        data['time-delta'] = [i - data['time'][0] for i in data['time']]
+    if 'hr' in data:
+        data['hr'] = np.array(data['hr'], dtype=np.int_)
+        data['heart rate'] = data['hr']
+
+    data['latlon'] = list(zip(data['lat'], data['lon']))
+
+    hrzone = [heart_rate_zones(i, maxpulse=maxpulse) for i in data['hr']]
     data['hr-zone'] = np.array([i[1] for i in hrzone], dtype=np.int_)
     data['hr-zone-float'] = np.array([i[0] for i in hrzone])
     data['hr-zone-frac'] = np.array([i[2] for i in hrzone])
@@ -285,7 +302,7 @@ def read_gpx_file(gpxfile, maxpulse=187):
         # Add some more processed data for segments
         for data in track_data['segments']:
             data['hr-regions'] = find_regions(data['hr-zone'])
-            data['delta-seconds'] = np.array(
+            data['elapsed-time'] = np.array(
                 [i.total_seconds() for i in data['time-delta']],
                 dtype=np.int_
             )
@@ -293,10 +310,10 @@ def read_gpx_file(gpxfile, maxpulse=187):
                 get_distances(data['lat'], data['lon'])
             )
             data['average-hr'] = (
-                np.trapz(data['pulse'], data['delta-seconds']) /
-                (data['delta-seconds'][-1] - data['delta-seconds'][0])
+                np.trapz(data['hr'], data['elapsed-time']) /
+                (data['elapsed-time'][-1] - data['elapsed-time'][0])
             )
-            ele_diff = np.diff(data['ele'])
-            data['ele-up'] = ele_diff[np.where(ele_diff > 0)[0]].sum()
-            data['ele-down'] = ele_diff[np.where(ele_diff < 0)[0]].sum()
+            ele_diff = np.diff(data['elevation'])
+            data['elevation-up'] = ele_diff[np.where(ele_diff > 0)[0]].sum()
+            data['elevation-down'] = ele_diff[np.where(ele_diff < 0)[0]].sum()
         yield track_data

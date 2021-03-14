@@ -37,8 +37,10 @@ def heart_rate_zones(pulse, maxpulse=187):
     return zone, int(zone), frac
 
 
-def heart_rate_zone_limits(maxpulse=187, lims=HR_LIMITS):
+def heart_rate_zone_limits(maxpulse=187, lims=None):
     """Return the limits for the heart rate zones."""
+    if lims is None:
+        lims = HR_LIMITS
     return [(maxpulse * i[0], maxpulse * i[1]) for i in lims]
 
 
