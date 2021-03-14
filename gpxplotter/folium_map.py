@@ -93,7 +93,7 @@ def add_colored_line(the_map, segment, color_by, line_options=None):
     colormap = branca.colormap.linear.viridis.scale(minz, maxz).to_step(10)
     colormap.caption = RELABEL.get(color_by, color_by)
     if line_options is None:
-        line_options = {}
+        line_options = {'weight': 6}
     line = folium.ColorLine(positions=segment['latlon'], colormap=colormap,
                             colors=avg, control=False, **line_options)
     line.add_to(the_map)
