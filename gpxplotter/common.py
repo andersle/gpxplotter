@@ -7,6 +7,16 @@
 # Define heart-rate limits:
 HR_LIMITS = [(0.5, 0.6), (0.6, 0.7), (0.7, 0.8), (0.8, 0.9), (0.9, 1.0)]
 
+# For adding text:
+RELABEL = {
+    'hr': 'Heart rate / bpm',
+    'distance': 'Distance / m',
+    'time': 'Time',
+    'elevation': 'Elevation / m',
+    'hr-zone-frac': 'Fraction of maximum heart rate',
+    'hr-zone-float': 'Heart rate zone',
+}
+
 
 def heart_rate_zones(pulse, maxpulse=187):
     """Calculate heart rate zones.
