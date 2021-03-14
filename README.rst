@@ -13,7 +13,20 @@ Examples
 Simple example for plotting an elevation profile with heart rate
 ----------------------------------------------------------------
 
-.. literalinclude:: examples/python/plot1.py
+.. code:: python
+
+   from gpxplotter import read_gpx_file
+   from gpxplotter.mplplotting import plot_filled
+   from matplotlib import pyplot as plt
+   plt.style.use('seaborn-talk')
+
+
+   for track in read_gpx_file('ruten.gpx'):
+       for i, segment in enumerate(track['segments']):
+           fig = plot_filled(track, segment, xvar='distance', yvar='elevation',
+                             zvar='hr', lw=4, color='k')
+           fig.savefig('plot1', bbox_inches='tight')
+
 
 .. image:: examples/images/plot1.png
    :scale: 50 %
@@ -25,20 +38,19 @@ Simple example for showing a track in a map, colored by heart rate
 
 .. code:: python
 
-   from gpxplotter import read_gpx_file
-   from gpxplotter.mplplotting import plot_map, save_map
-   
-   
-   for track in read_gpx_file('test.gpx'):
+   from gpxplotter import read_gpx_file, create_folium_map, add_segment_to_map
+
+   the_map = create_folium_map()
+   for track in read_gpx_file('ruten.gpx'):
        for i, segment in enumerate(track['segments']):
-           fig = plot_map(track, segment, zcolor='pulse')
-           save_map(fig, 'test-{}.html'.format(i))
+           add_segment_to_map(the_map, segment, color_by='hr')
+   the_map.save('test.html')
+
+.. raw:: html
+
+   <iframe src="examples/python/test.html" height="500px" width="100%"></iframe>
 
 
-.. image:: examples/images/test-hr-map.png
-   :scale: 50 %
-   :alt: Example output
-   :align: center
 
 
 Installation
