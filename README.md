@@ -5,13 +5,10 @@
 
 *gpxplotter* is a Python package for reading 
 [gpx](https://en.wikipedia.org/wiki/GPS_Exchange_Format)
-files and creating simple plots.
-
-The intended usage is for displaying heart rate information together with
-other information (e.g. elevation and time). 
-
-It uses [matplotlib](http://matplotlib.org/) to create some simple predefined plots and
-[folium](https://python-visualization.github.io/folium/) for creating maps.
+files and creating simple predefined plots using
+[matplotlib](http://matplotlib.org/) 
+and maps using
+[folium](https://python-visualization.github.io/folium/).
 
 Please see
 [https://gpxplotter.readthedocs.io/en/latest/](https://gpxplotter.readthedocs.io/en/latest/)
@@ -19,9 +16,9 @@ for the latest documentation.
 
 ## Installation
 
-gpxplotter can be installed via pip:
-
-``pip install gpxplotter``
+```
+pip install gpxplotter
+```
 
 ## Examples
 
