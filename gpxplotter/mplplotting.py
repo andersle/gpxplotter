@@ -5,11 +5,12 @@
 from math import floor, ceil
 import datetime
 import numpy as np
-from matplotlib.collections import PolyCollection, LineCollection
-from matplotlib.cm import get_cmap
-from matplotlib.colors import Normalize
-import matplotlib.patches as mpatches
 from matplotlib import pyplot as plt
+from matplotlib.collections import PolyCollection, LineCollection
+from matplotlib.colors import Normalize
+from matplotlib.cm import get_cmap
+import matplotlib.dates as mdates
+import matplotlib.patches as mpatches
 from gpxplotter.common import format_time_delta, RELABEL
 
 
@@ -349,6 +350,37 @@ def _shift_elapsed_labels(axi, start_time, which='x'):
         axi.set_yticklabels(time_lab)
 
 
+def _update_time_ticklabels(axi, xvar, yvar, xdata, ydata):
+    """Update time tick labels for time data.
+
+    Parameters
+    ----------
+    axi : object like :py:class:`matplotlib.axes.Axes`
+        The axes to add ticks for.
+    xvar : string
+        The variable used for the x-axis.
+    yvar : string
+        The variable used for the y-axis.
+    xdata : array_like
+        The data used for the x-axis.
+    ydata : array_like
+        The data used for the y-axis.
+
+    """
+    # Add nicer labels if we have elapsed-time:
+    if xvar == 'elapsed-time':
+        _add_elapsed_labels(axi, xdata, which='x')
+    elif xvar == 'time':
+        fmt = mdates.DateFormatter("%H:%M:%S")
+        axi.xaxis.set_major_formatter(fmt)
+        axi.tick_params(axis='x', rotation=25)
+    if yvar == 'elapsed-time':
+        _add_elapsed_labels(axi, ydata, which='y')
+    elif yvar == 'time':
+        fmt = mdates.DateFormatter("%H:%M:%S")
+        axi.yaxis.set_major_formatter(fmt)
+
+
 def plot_line(track, data, xvar='distance', yvar='elevation', zvar=None,
               **kwargs):
     """Plot line data from a segment.
@@ -407,11 +439,7 @@ def plot_line(track, data, xvar='distance', yvar='elevation', zvar=None,
             _add_elapsed_labels(ax1, ydata, which='y')
             ydata = _get_data(data, yvar)
             _shift_elapsed_labels(ax1, ydata[0], which='y')
-    # Add nicer labels if we have elapsed-time:
-    if xvar == 'elapsed-time':
-        _add_elapsed_labels(ax1, xdata, which='x')
-    if yvar == 'elapsed-time':
-        _add_elapsed_labels(ax1, ydata, which='y')
+    _update_time_ticklabels(ax1, xvar, yvar, xdata, ydata)
     return fig
 
 
@@ -467,9 +495,5 @@ def plot_filled(track, data, xvar='distance', yvar='elevation', zvar='hr',
         col = ax1.add_collection(poly)
         add_colorbar(fig, ax1, col, zvar, norm)
 
-    # Add nicer labels if we have elapsed-time:
-    if xvar == 'elapsed-time':
-        _add_elapsed_labels(ax1, xdata, which='x')
-    if yvar == 'elapsed-time':
-        _add_elapsed_labels(ax1, ydata, which='y')
+    _update_time_ticklabels(ax1, xvar, yvar, xdata, ydata)
     return fig

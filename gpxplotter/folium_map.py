@@ -2,8 +2,9 @@
 # Copyright (c) 2021, Anders Lervik.
 # Distributed under the LGPLv2.1+ License. See LICENSE for more info.
 """This module defines methods for interfacing with folium."""
+from math import ceil
 import folium
-import folium.features
+#import folium.features
 import branca.colormap
 import numpy as np
 from gpxplotter.common import RELABEL
@@ -33,31 +34,54 @@ TILES = [
 ]
 
 
-def create_folium_map(tiles=None):
+def create_folium_map(**kwargs):
     """Create a folium map.
+
+    Parameters
+    ----------
+    kwargs : optional
+        Arguments passed to the method generating the map,
+        see :py:func:`folium.Map`.
 
     Returns
     -------
-    the_map : object like folium.folium.Map
+    the_map : object like :py:class:`folium.folium.Map`
         The map created here.
 
     """
-    the_map = folium.Map(
-        location=['63.446827', 10.421906],
-        tiles=None,
-        zoom_start=11,
-        control_scale=True,
-    )
-    folium.TileLayer('openstreetmap').add_to(the_map)
-    if tiles is None:
-        tiles = TILES
-    for tile in tiles:
+    # Add a few defaults:
+    kwargs['control_scale'] = kwargs.get('control_scale', True)
+    kwargs['tiles'] = kwargs.get('tiles', None)
+    the_map = folium.Map(**kwargs)
+    # Add extra tiles:
+    for tile in TILES:
         folium.TileLayer(
             tile['url'], attr=tile['attr'], name=tile['name']
         ).add_to(the_map)
+    folium.TileLayer('openstreetmap').add_to(the_map)
     folium.TileLayer('stamenterrain').add_to(the_map)
     folium.LayerControl().add_to(the_map)
     return the_map
+
+
+def add_start_top_markers(the_map, segment):
+    """Add markers for the start and end of the segment."""
+    start_time = segment['time'][0].strftime('%A %B %d, %Y: %H:%M:%S')
+    start = folium.Marker(
+        location=segment['latlon'][0],
+        tooltip='Start',
+        popup=folium.Popup(start_time, max_width=250),
+        icon=folium.Icon(icon='ok', color='green'),
+    )
+    start.add_to(the_map)
+    end_time = segment['time'][-1].strftime('%A %B %d, %Y: %H:%M:%S')
+    stop = folium.Marker(
+        location=segment['latlon'][-1],
+        tooltip='End',
+        popup=folium.Popup(end_time, max_width=250),
+        icon=folium.Icon(icon='home', color='lightgray'),
+    )
+    stop.add_to(the_map)
 
 
 def add_segment_to_map(the_map, segment, color_by=None, line_options=None):
@@ -69,20 +93,9 @@ def add_segment_to_map(the_map, segment, color_by=None, line_options=None):
         line.add_to(the_map)
     else:
         add_colored_line(the_map, segment, color_by)
-    start = folium.Marker(
-        location=segment['latlon'][0],
-        tooltip='Start',
-        icon=folium.Icon(icon='ok', color='green'),
-    )
-    start.add_to(the_map)
-    stop = folium.Marker(
-        location=segment['latlon'][-1],
-        tooltip='End',
-        icon=folium.Icon(icon='home', color='lightgray'),
-    )
-    stop.add_to(the_map)
-    the_map.location = list(np.mean(segment['latlon'], axis=0))
-    the_map.options['zoom'] = 15
+    add_start_top_markers(the_map, segment)
+    boundary = the_map.get_bounds()
+    the_map.fit_bounds(boundary, padding=(3, 3))
 
 
 def add_colored_line(the_map, segment, color_by, line_options=None):
@@ -94,6 +107,7 @@ def add_colored_line(the_map, segment, color_by, line_options=None):
     colormap.caption = RELABEL.get(color_by, color_by)
     if line_options is None:
         line_options = {'weight': 6}
+    line_options['weight'] = line_options.get('weight', 6)
     line = folium.ColorLine(positions=segment['latlon'], colormap=colormap,
                             colors=avg, control=False, **line_options)
     line.add_to(the_map)
