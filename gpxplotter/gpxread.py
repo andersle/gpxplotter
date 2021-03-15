@@ -289,7 +289,10 @@ def approximate_velocity(distance, time):
 
     """
     spline = UnivariateSpline(time, distance, k=1)
-    return spline.derivative()(time)
+    vel = spline.derivative()(time)
+    idx = np.where(vel < 0)[0]
+    vel[idx] = 0.0
+    return vel
 
 
 def read_gpx_file(gpxfile, maxpulse=187):
@@ -339,4 +342,5 @@ def read_gpx_file(gpxfile, maxpulse=187):
                 data['distance'], data['elapsed-time']
             )
             data['pace'] = 1.0 / ((60. / 1000) * data['velocity'])
+            data['Velocity / km/h'] = 3.6 * data['velocity']
         yield track_data
