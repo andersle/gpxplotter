@@ -1,7 +1,7 @@
 # gpxplotter
 
 [![Documentation Status](https://readthedocs.org/projects/gpxplotter/badge/?version=latest)](https://gpxplotter.readthedocs.io/en/latest/?badge=latest)
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/andersle/gpxplotter/master?filepath=%2Flectures)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/andersle/gpxplotter/master?filepath=examples%2Fjupyter%2Fexamples.ipynb)
 
 *gpxplotter* is a Python package for reading 
 [gpx](https://en.wikipedia.org/wiki/GPS_Exchange_Format)
@@ -23,7 +23,7 @@ pip install gpxplotter
 ## Examples
 
 Interactive examples can be explored
-via [Binder](https://mybinder.org/v2/gh/andersle/gpxplotter/master?filepath=%2Flectures)
+via [Binder](https://mybinder.org/v2/gh/andersle/gpxplotter/master?filepath=examples%2Fjupyter%2Fexamples.ipynb).
 
 
 #### Simple example for showing a track in a map, colored by heart rate
