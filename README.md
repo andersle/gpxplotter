@@ -46,4 +46,4 @@ the_map
 the_map.save('map_001.html')
 ```
 
-[![map](examples/images/map001.png)](https://psynlig.readthedocs.io/en/latest/auto_examples/index.html)
+[![map](examples/images/map001.png)](examples/html/map001.html)
