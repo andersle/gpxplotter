@@ -1,19 +1,17 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2020, Anders Lervik.
+# Copyright (c) 2021, Anders Lervik.
 # Distributed under the LGPLv2.1+ License. See LICENSE for more info.
 """This module defines methods for plotting GPX data using matplotlib."""
 from math import floor, ceil
+import datetime
 import numpy as np
-from matplotlib.collections import PolyCollection
-from matplotlib.cm import get_cmap
-from matplotlib.colors import Normalize
-from matplotlib.colorbar import ColorbarBase
-import matplotlib.patches as mpatches
-from matplotlib import gridspec
 from matplotlib import pyplot as plt
-import mplleaflet
-from mplleaflet.maptiles import tiles
-from gpxplotter.common import heart_rate_zone_limits, format_time_delta
+from matplotlib.collections import PolyCollection, LineCollection
+from matplotlib.colors import Normalize
+from matplotlib.cm import get_cmap
+import matplotlib.dates as mdates
+import matplotlib.patches as mpatches
+from gpxplotter.common import format_time_delta, RELABEL
 
 
 ZONE_COLORS_0 = {
@@ -41,11 +39,11 @@ def make_patches(xdata, ydata, zdata, cmap_name='viridis'):
 
     Parameters
     ----------
-    xdata : list or numpy.array or similar
+    xdata : list or array_like
         The x positions for the curve.
-    ydata : list or numpy.array or similar
+    ydata : list or array_like
         The y positions for the curve.
-    zdata : list or numpy.array or similar
+    zdata : list or array_like
         A list of values associated with each point, used for
         coloring.
     cmap_name : string, optional
@@ -53,7 +51,7 @@ def make_patches(xdata, ydata, zdata, cmap_name='viridis'):
 
     Returns
     -------
-    out[0] : object like :py:class:`.PolyCollection`
+    out[0] : object like :py:class:`matplotlib.collections.PolyCollection`
         The polygons created here, with individual colors.
     out[1] : list of floats
         The colors associated with the given ``zdata``.
@@ -89,335 +87,413 @@ def make_patches(xdata, ydata, zdata, cmap_name='viridis'):
                 [xprev, 0], [xprev, yprev], [xval, yval],
                 [xnext, ynext], [xnext, 0]
             ])
-    return (PolyCollection(verts, facecolors=colors, edgecolors=colors),
-            colors, cmap, norm)
+    col = PolyCollection(verts, facecolors=colors, edgecolors=colors,
+                         cmap=cmap_name)
+    return col, colors, cmap, norm
 
 
 def _make_time_labels(delta_seconds, nlab=5):
-    """Make n time formatted labels for data i seconds"""
+    """Make n time-formatted labels for data in seconds"""
     label_pos = np.linspace(min(delta_seconds), max(delta_seconds),
                             nlab, dtype=np.int_)
     label_lab = format_time_delta(label_pos)
     return label_pos, label_lab
 
 
-def plot_elevation_hr(track, data):
-    """Plot the elevation profile with heart rate annotations.
+def set_up_figure(track):
+    """Helper method to create a figure.
 
-    This will plot as a function of time.
+    This method will just create the figure and axis and
+    set the title.
 
-    """
-    fig = plt.figure()
-    ax1 = fig.add_subplot(111)
-    ax1.set_title('{}: {}'.format(track['name'][0], track['type'][0]))
-    ax1.set_facecolor('0.90')
-    xdata = data['delta-seconds']
-    ydata = data['ele']
-    ax1.plot(xdata, ydata, color='#262626', lw=3)
-    handles = []
-    legends = []
-    for i in data['hr-regions']:
-        xpos = xdata[i[0]:i[1]+1]
-        ypos = ydata[i[0]:i[1]+1]
-        idx = 0 if i[2] < 3 else 1
-        ax1.fill_between(xpos, 0, ypos, alpha=1.0,
-                         color=ZONE_COLORS[idx])
-    patch = mpatches.Patch(color=ZONE_COLORS[0])
-    legend = r'Zone $\leq$ 2'
-    handles.append(patch)
-    legends.append(legend)
-    patch = mpatches.Patch(color=ZONE_COLORS[1])
-    legend = 'Zone > 2'
-    handles.append(patch)
-    legends.append(legend)
-    ax1.legend(handles, legends)
-    ax1.set_ylim(min(ydata) - 2, max(ydata) + 2)
-    label_pos, label_lab = _make_time_labels(xdata, 5)
-    ax1.set_xticks(label_pos)
-    ax1.set_xticklabels(label_lab, rotation=25)
-    ax1.set_xlabel('Time')
-    ax1.set_ylabel('Elevation / m')
-    fig.tight_layout()
-    return fig
+    Parameters
+    ----------
+    track : dict
+        The track we are creating a figure for.
 
 
-def plot_elevation_hr_dist(track, data):
-    """Plot the elevation profile with heart rate annotations.
-
-    This will plot as a function of distance.
+    Returns
+    -------
+    fig: object like :py:class:`matplotlib.figure.Figure`
+        The figure created here.
+    axi : object like :py:class:`matplotlib.axes.Axes`
+        The axis created here
 
     """
-    fig = plt.figure()
-    ax1 = fig.add_subplot(111)
-    ax1.set_title('{}: {}'.format(track['name'][0], track['type'][0]))
-    ax1.set_facecolor('0.90')
-    xdata = data['distance'] / 1000.
-    ydata = data['ele']
-    ax1.plot(xdata, ydata, color='#262626', lw=3)
-    handles = []
-    legends = []
-    for i in data['hr-regions']:
-        xpos = xdata[i[0]:i[1]+1]
-        ypos = ydata[i[0]:i[1]+1]
-        idx = 0 if i[2] < 3 else 1
-        ax1.fill_between(xpos, 0, ypos, alpha=1.0,
-                         color=ZONE_COLORS[idx])
-    patch = mpatches.Patch(color=ZONE_COLORS[0])
-    legend = r'Zone $\leq$ 2'
-    handles.append(patch)
-    legends.append(legend)
-    patch = mpatches.Patch(color=ZONE_COLORS[1])
-    legend = 'Zone > 2'
-    handles.append(patch)
-    legends.append(legend)
-    ax1.legend(handles, legends)
-    ax1.set_ylim(min(ydata) - 2, max(ydata) + 2)
-    ax1.set_xlabel('Distance / km')
-    ax1.set_ylabel('Elevation / m')
-    fig.tight_layout()
-    return fig
+    fig, ax1 = plt.subplots(constrained_layout=True)
+    ax1.set_title(f'{track["name"][0]}: {track["type"][0]}')
+    return fig, ax1
 
 
-def plot_elevation_hrz(track, data):
-    """Plot the elevation profile with heart rate zones."""
-    fig = plt.figure()
-    ax1 = fig.add_subplot(111)
-    ax1.set_facecolor('0.90')
-    ax1.set_title('{}: {}'.format(track['name'][0], track['type'][0]))
-    xdata = data['delta-seconds']
-    ydata = data['ele']
-    ax1.plot(xdata, ydata, color='#262626', lw=3)
-    handles = []
-    legends = []
-    for i in data['hr-regions']:
-        xpos = xdata[i[0]:i[1]+1]
-        ypos = ydata[i[0]:i[1]+1]
-        ax1.fill_between(xpos, 0, ypos, alpha=1.0,
-                         color=ZONE_COLORS_0[i[2]])
-    for i in range(1, 6):
-        patch = mpatches.Patch(color=ZONE_COLORS_0[i])
-        legend = 'Zone = {}'.format(i)
-        handles.append(patch)
-        legends.append(legend)
-    ax1.legend(handles, legends)
-    ax1.set_ylim(min(ydata) - 2, max(ydata) + 2)
-    label_pos, label_lab = _make_time_labels(xdata, 5)
-    ax1.set_xticks(label_pos)
-    ax1.set_xticklabels(label_lab, rotation=25)
-    ax1.set_xlabel('Time')
-    ax1.set_ylabel('Elevation / m')
-    fig.tight_layout()
-    return fig
+def add_colorbar(figi, axi, patch, zvar, norm):
+    """Add colorbar to figure.
+
+    Parameters
+    ----------
+    figi: object like :py:class:`matplotlib.figure.Figure`
+        The figure to add the color bar to.
+    axi : object like :py:class:`matplotlib.axes.Axes`
+        The axes to which we add the color bar next to.
+    patch : object like :py:class:`matplotlib.cm.ScalarMappable`
+        The mappable described by the color bar.
+    zvar : string
+        The variable we are using for coloring.
+    norm :  :py:class:`matplotlib.colors.Normalize`
+        The normalization of values for mapping to colors.
+
+    """
+    cbar = figi.colorbar(patch, ax=axi)
+    cbar.set_label(RELABEL.get(zvar, zvar))
+    ticks, ticks_pos = [], []
+    for i in cbar.get_ticks():
+        ticks.append(f'{norm.inverse(i):g}')
+        ticks_pos.append(i)
+    cbar.set_ticks(ticks_pos)
+    cbar.set_ticklabels(ticks)
 
 
-def plot_elevation_hrz_dist(track, data):
-    """Plot the elevation profile with heart rate zones."""
-    fig = plt.figure()
-    ax1 = fig.add_subplot(111)
-    ax1.set_facecolor('0.90')
-    ax1.set_title('{}: {}'.format(track['name'][0], track['type'][0]))
-    xdata = data['distance'] / 1000.
-    ydata = data['ele']
-    ax1.plot(xdata, ydata, color='#262626', lw=3)
-    handles = []
-    legends = []
-    for i in data['hr-regions']:
-        xpos = xdata[i[0]:i[1]+1]
-        ypos = ydata[i[0]:i[1]+1]
-        ax1.fill_between(xpos, 0, ypos, alpha=1.0,
-                         color=ZONE_COLORS_0[i[2]])
-    for i in range(1, 6):
-        patch = mpatches.Patch(color=ZONE_COLORS_0[i])
-        legend = 'Zone = {}'.format(i)
-        handles.append(patch)
-        legends.append(legend)
-    ax1.legend(handles, legends)
-    ax1.set_ylim(min(ydata) - 2, max(ydata) + 2)
-    ax1.set_xlabel('Distance / km')
-    ax1.set_ylabel('Elevation / m')
-    fig.tight_layout()
-    return fig
+def add_regions(axi, xdata, ydata, regions, cut):
+    """Add heart rate patches to axis.
+
+    Parameters
+    ----------
+    axi : object like :py:class:`matplotlib.axes.Axes`
+        The axes to add regions to.
+    xdata : array_like
+        The x-values we are plotting for.
+    ydata : array_like
+        The y-values we are plotting for.
+    regions : list of lists
+        regions[i] defines a heart rate region as [start, stop, hr-region].
+    cut : integer, optional
+        If given, the zones will be divided into smaller (inclusive) or
+        larger than the given cut.
+
+    """
+    legends, handles = [], []
+    if cut is None:
+        for i in regions:
+            xpos = xdata[i[0]:i[1]+1]
+            ypos = ydata[i[0]:i[1]+1]
+            axi.fill_between(xpos, min(ydata), ypos, alpha=1.0,
+                             color=ZONE_COLORS_0[i[2]])
+        for i in range(1, 6):
+            patch = mpatches.Patch(color=ZONE_COLORS_0[i])
+            legend = f'Zone = {i}'
+            handles.append(patch)
+            legends.append(legend)
+    else:
+        for i in regions:
+            xpos = xdata[i[0]:i[1]+1]
+            ypos = ydata[i[0]:i[1]+1]
+            idx = 0 if i[2] <= cut else 1
+            axi.fill_between(
+                xpos,
+                min(ydata),
+                ypos,
+                alpha=1.0,
+                color=ZONE_COLORS[idx]
+            )
+        handles.append(mpatches.Patch(color=ZONE_COLORS[0]))
+        legends.append(fr'Zone $\leq$ {cut}')
+        handles.append(mpatches.Patch(color=ZONE_COLORS[1]))
+        legends.append(f'Zone > {cut}')
+    axi.legend(handles, legends)
 
 
-def plot_elevation_hr_multi(track, data):
-    """Plot the elevation profile with heart rate annotations."""
-    fig = plt.figure()
-    ncol = 20
-    grid = gridspec.GridSpec(1, ncol)
-    ax1 = fig.add_subplot(grid[:, :ncol-1])
-    ax1.set_title('{}: {}'.format(track['name'][0], track['type'][0]))
-    cbarax = fig.add_subplot(grid[:, ncol-1])
-    ax1.set_facecolor('0.90')
-    xdata = data['delta-seconds']
-    ydata = data['ele']
-    ax1.plot(xdata, ydata, color='#262626', lw=3)
-    poly, _, cmap, norm = make_patches(xdata, ydata, data['pulse'],
-                                       cmap_name='viridis')
-    _ = ColorbarBase(cbarax, cmap=cmap, norm=norm, label='Heart rate / bpm')
-    ax1.add_collection(poly)
-    ax1.set_ylim(min(ydata) - 2, max(ydata) + 2)
-    label_pos, label_lab = _make_time_labels(xdata, 5)
-    ax1.set_xticks(label_pos)
-    ax1.set_xticklabels(label_lab, rotation=25)
-    ax1.set_xlabel('Time')
-    ax1.set_ylabel('Elevation / m')
-    fig.tight_layout()
-    return fig
+def _get_data(data, key):
+    """Attempt to read a key from a dictionary.
 
+    This method is here to give some more instructive error messages.
 
-def plot_elevation_hr_multi_dist(track, data):
-    """Plot the elevation profile with heart rate annotations."""
-    fig = plt.figure()
-    ncol = 20
-    grid = gridspec.GridSpec(1, ncol)
-    ax1 = fig.add_subplot(grid[:, :ncol-1])
-    ax1.set_title('{}: {}'.format(track['name'][0], track['type'][0]))
-    cbarax = fig.add_subplot(grid[:, ncol-1])
-    ax1.set_facecolor('0.90')
-    xdata = data['distance'] / 1000.
-    ydata = data['ele']
-    ax1.plot(xdata, ydata, color='#262626', lw=3)
-    poly, _, cmap, norm = make_patches(xdata, ydata, data['pulse'],
-                                       cmap_name='viridis')
-    _ = ColorbarBase(cbarax, cmap=cmap, norm=norm, label='Heart rate / bpm')
-    ax1.add_collection(poly)
-    ax1.set_ylim(min(ydata) - 2, max(ydata) + 2)
-    ax1.set_xlabel('Distance / km')
-    ax1.set_ylabel('Elevation / m')
-    fig.tight_layout()
-    return fig
+    Parameters
+    ----------
+    data : dict
+        The dictionary to read from.
+    key : string
+        The key we attempt to read from the dictionary.
 
-
-def plot_hr(data, maxpulse=187):
-    """Plot the elevation profile with heart rate annotations."""
-    fig = plt.figure()
-    ax1 = fig.add_subplot(111)
-    ax1.set_facecolor('0.90')
-    xdata = data['delta-seconds']
-    ydata = data['pulse']
-    handles = []
-    legends = []
-    zones = heart_rate_zone_limits(maxpulse=maxpulse)
-    for i, zone in enumerate(zones):
-        patch = mpatches.Patch(color=ZONE_COLORS_0[i+1])
-        legend = 'Zone = {}'.format(i + 1)
-        handles.append(patch)
-        legends.append(legend)
-        ax1.axhspan(zone[0], zone[1], color=ZONE_COLORS_0[i+1])
-    ax1.plot(xdata, ydata, color='#262626', lw=3)
-    ax1.legend(handles, legends)
-    ax1.set_ylim(min(ydata) - 2, max(ydata) + 2)
-    label_pos, label_lab = _make_time_labels(xdata, 5)
-    ax1.set_xticks(label_pos)
-    ax1.set_xticklabels(label_lab, rotation=25)
-    ax1.set_xlabel('Time')
-    ax1.set_ylabel('Heart rate / bpm')
-    fig.tight_layout()
-    return fig
-
-
-def plot_hr_time(data):
-    """Plot the elevation profile with heart rate annotations."""
-    fig = plt.figure()
-    ax1 = fig.add_subplot(111)
-    ax1.set_facecolor('0.90')
-    xdata = data['delta-seconds']
-    handles = []
-    legends = []
-    zones = {i + 1: 0 for i in range(5)}
-    for i in data['hr-regions']:
-        xpos = xdata[i[0]:i[1]+1]
-        zones[i[2]] += (xpos[-1] - xpos[0])
-    total_time = xdata[-1]
-    for key, val in zones.items():
-        ax1.bar(key, val / total_time, 1.0, align='center',
-                color=ZONE_COLORS_0[key])
-        patch = mpatches.Patch(color=ZONE_COLORS_0[key])
-        legend = 'Zone {}'.format(key)
-        handles.append(patch)
-        legends.append(legend)
-    ax1.text(
-        0.05,
-        0.90,
-        'Average heart rate: {}'.format(int(np.round(data['average-hr']))),
-        transform=ax1.transAxes,
-        fontsize=20,
-    )
-    ax1.legend(handles, legends)
-    ax1.set_xlabel('Zone')
-    ax1.set_ylabel('Fraction of time')
-    fig.tight_layout()
-    return fig
-
-
-def save_fig(fig, name):
-    """Just store a figure."""
-    fig.savefig(name)
-
-
-def monkey_patch_tiles(mpltiles):
-    """Add some new tiles to the mplleaflet."""
-    mpltiles['norgeskart_topo4'] = (
-        (
-            'http://opencache.statkart.no/gatekeeper/gk/gk.open_gmaps?'
-            'layers=topo4&zoom={z}&x={x}&y={y}'
-        ),
-        (
-            '<a href="http://www.kartverket.no">Kartverket</a>'
+    Returns
+    -------
+    out : any
+        The values returned by ``data[key]``.
+    """
+    kdata = None
+    try:
+        kdata = data[key]
+    except KeyError as error:
+        msg = (
+            f'Requested "{key}" not found in data!'
+            f'\nValid: {data.keys()}'
         )
-    )
-    mpltiles['norgeskart_toporaster3'] = (
-        (
-            'http://opencache.statkart.no/gatekeeper/gk/gk.open_gmaps?'
-            'layers=toporaster3&zoom={z}&x={x}&y={y}'
-        ),
-        (
-            '<a href="http://www.kartverket.no">Kartverket</a>'
-        ),
-    )
+        raise Exception(msg) from error
+    return kdata
 
 
-def plot_map(track, data, zcolor='pulse'):
-    """Plot the elevation profile with heart rate annotations."""
-    fig = plt.figure()
-    ax1 = fig.add_subplot(111)
-    ax1.set_title('{}: {}'.format(track['name'][0], track['type'][0]))
-    xdata = data['lon']
-    ydata = data['lat']
-    zdata = data[zcolor]
-    cmap = get_cmap('viridis')
-    norm = Normalize(vmin=floor(min(zdata)), vmax=ceil(max(zdata)))
-    colors = [cmap(norm(i)) for i in zdata]
-    for i, (xval, yval) in enumerate(zip(xdata, ydata)):
-        try:
-            ax1.plot([xval, xdata[i + 1]], [yval, ydata[i + 1]],
-                     color=colors[i], lw=4)
-        except IndexError:
-            break
-    fig.tight_layout()
+def add_segmented_line(xdata, ydata, zdata, cmap='viridis'):
+    """Create multicolored line.
+
+    Create a multicolored line colored after the zdata-values.
+
+    Parameters
+    ----------
+    xdata : array_like
+        x-positions to use.
+    ydata : array_like
+        y-positions to use.
+    zdata : array_like
+        Values to use for coloring the line segments.
+    cmap : string, optional
+        Colormap to use for the colors.
+
+    Returns
+    -------
+    out : object like :py:class:`matplotlib.collections.LineCollection`
+        The multicolored lines.
+
+    Note
+    ----
+    https://matplotlib.org/stable/gallery/lines_bars_and_markers/multicolored_line.html
+
+    """
+    norm = Normalize(min(zdata), max(zdata))
+    points = np.array([xdata, ydata]).T.reshape(-1, 1, 2)
+    segments = np.concatenate([points[:-1], points[1:]], axis=1)
+    lines = LineCollection(segments, cmap=cmap, norm=norm)
+    lines.set_array(zdata)
+    return lines
+
+
+def _update_limits(axi, data, which='x', factor=0.025):
+    """Update limits for axes (x or y).
+
+    This method will lengthen the given axes.
+
+    Parameters
+    ----------
+    axi : object like :py:class:`matplotlib.axes.Axes`
+        The axes to update for.
+    data : array_like
+        The data we are plotting on the given axes.
+    which : string, optional
+        Determines if we are updating the x or y-axes.
+    factor : float, optional
+        Half of the factor of the current length to add.
+
+    """
+    length = abs(data.max() - data.min())
+    if which == 'x':
+        axi.set_xlim(
+            data.min() - length * factor, data.max() + length * factor
+        )
+    elif which == 'y':
+        axi.set_ylim(
+            data.min() - length * factor, data.max() + length * factor
+        )
+    else:
+        pass
+
+
+def _add_elapsed_labels(axi, data, which='x'):
+    """Add nicer labels for time-difference.
+
+    Convert elapsed time in seconds to hours:minutes:seconds.
+
+    Parameters
+    ----------
+    axi : object like :py:class:`matplotlib.axes.Axes`
+        The axes to add ticks for.
+    data : array_like
+        The data we are updating.
+    which : string, optional
+        Selects the axes (x or y) we are updating.
+
+    """
+    label_pos, label_lab = _make_time_labels(data, 5)
+    if which == 'x':
+        axi.set_xticks(label_pos)
+        axi.set_xticklabels(label_lab, rotation=25)
+        axi.set_xlabel('Time')
+    elif which == 'y':
+        axi.set_yticks(label_pos)
+        axi.set_yticklabels(label_lab)
+        axi.set_ylabel('Time')
+
+
+def _shift_elapsed_labels(axi, start_time, which='x'):
+    """Shift elapsed labels with a given time origin.
+
+    Make a time difference start at a given time.
+
+    Parameters
+    ----------
+    axi : object like :py:class:`matplotlib.axes.Axes`
+        The axes to add ticks for.
+    start_time : object like :py:class:`datetime.datetime`
+        The starting time to use for shifting.
+    which : string, optional
+        Selects the axes (x or y) we are updating.
+
+    """
+    if which == 'x':
+        ticks = axi.get_xticks()
+    elif which == 'y':
+        ticks = axi.get_yticks()
+    else:
+        ticks = []
+    seconds = [datetime.timedelta(seconds=int(i)) for i in ticks]
+    time = [start_time + i for i in seconds]
+    time_lab = [i.strftime('%H:%M:%S') for i in time]
+    if which == 'x':
+        axi.set_xticklabels(time_lab)
+    elif which == 'y':
+        axi.set_yticklabels(time_lab)
+
+
+def _update_time_ticklabels(axi, xvar, yvar, xdata, ydata):
+    """Update time tick labels for time data.
+
+    Parameters
+    ----------
+    axi : object like :py:class:`matplotlib.axes.Axes`
+        The axes to add ticks for.
+    xvar : string
+        The variable used for the x-axis.
+    yvar : string
+        The variable used for the y-axis.
+    xdata : array_like
+        The data used for the x-axis.
+    ydata : array_like
+        The data used for the y-axis.
+
+    """
+    # Add nicer labels if we have elapsed-time:
+    if xvar == 'elapsed-time':
+        _add_elapsed_labels(axi, xdata, which='x')
+    elif xvar == 'time':
+        fmt = mdates.DateFormatter("%H:%M:%S")
+        axi.xaxis.set_major_formatter(fmt)
+        axi.tick_params(axis='x', rotation=25)
+    if yvar == 'elapsed-time':
+        _add_elapsed_labels(axi, ydata, which='y')
+    elif yvar == 'time':
+        fmt = mdates.DateFormatter("%H:%M:%S")
+        axi.yaxis.set_major_formatter(fmt)
+
+
+def plot_line(track, data, xvar='distance', yvar='elevation', zvar=None,
+              **kwargs):
+    """Plot line data from a segment.
+
+    Plot a given segment from a track as a line. The line
+    can be colored according to a given value.
+
+    Parameters
+    ----------
+    track : dict
+        The track we are plotting for.
+    data : dict
+        The segment we are plotting.
+    xvar : string, optional
+        Selects the variable to use for the x-axes.
+    yvar : string, optional
+        Selects the variable to use for the y-axes.
+    zvar : string, optional
+        Selects the variable to use for coloring the line.
+    **kwargs : matplotlib.lines.Line2D properties, optional
+        Extra properties for the plotting passed to the ``axi.plot``
+        method.
+
+    Returns
+    -------
+    fig: object like :py:class:`matplotlib.figure.Figure`
+        The figure created here.
+
+    """
+    fig, ax1 = set_up_figure(track)
+    xdata = _get_data(data, xvar)
+    ydata = _get_data(data, yvar)
+    ax1.set(xlabel=RELABEL.get(xvar, xvar), ylabel=RELABEL.get(yvar, yvar))
+    if zvar is None:
+        ax1.plot(xdata, ydata, **kwargs)
+    else:
+        zdata = _get_data(data, zvar)
+        # For time, use the elapsed-time for making the segmented line
+        if xvar == 'time':
+            xdata = _get_data(data, 'elapsed-time')
+        if yvar == 'time':
+            ydata = _get_data(data, 'elapsed-time')
+        lines = add_segmented_line(xdata, ydata, zdata, cmap='viridis')
+        lines.set_linewidth(kwargs.get('lw', 3))
+        line = ax1.add_collection(lines)
+        _update_limits(ax1, xdata, which='x')
+        _update_limits(ax1, ydata, which='y')
+        cbar = fig.colorbar(line, ax=ax1)
+        cbar.set_label(RELABEL.get(zvar, zvar))
+        # Shift back for time:
+        if xvar == 'time':
+            _add_elapsed_labels(ax1, xdata, which='x')
+            xdata = _get_data(data, xvar)
+            _shift_elapsed_labels(ax1, xdata[0], which='x')
+        if yvar == 'time':
+            _add_elapsed_labels(ax1, ydata, which='y')
+            ydata = _get_data(data, yvar)
+            _shift_elapsed_labels(ax1, ydata[0], which='y')
+    _update_time_ticklabels(ax1, xvar, yvar, xdata, ydata)
     return fig
 
 
-def plot_map_zones(track, data):
-    """Plot the elevation profile with heart rate annotations."""
-    fig = plt.figure()
-    ax1 = fig.add_subplot(111)
-    ax1.set_title('{}: {}'.format(track['name'][0], track['type'][0]))
-    xdata = data['lon']
-    ydata = data['lat']
-    for i, (xval, yval, zone) in enumerate(zip(xdata, ydata, data['hr-zone'])):
-        try:
-            ax1.plot([xval, xdata[i + 1]], [yval, ydata[i + 1]],
-                     color=ZONE_COLORS_1[zone])
-        except IndexError:
-            break
-    fig.tight_layout()
+def plot_filled(track, data, xvar='distance', yvar='elevation', zvar='hr',
+                cmap='viridis', cut=None, **kwargs):
+    """Plot a filled graph (line with colored area).
+
+    Plot a line and fill the area under it, given a specified variable.
+
+    Parameters
+    ----------
+    track : dict
+        The track we are plotting for.
+    data : dict
+        The segment we are plotting.
+    xvar : string, optional
+        Selects the variable to use for the x-axes.
+    yvar : string, optional
+        Selects the variable to use for the y-axes.
+    zvar : string, optional
+        Selects the variable to use for coloring the area.
+    cmap : string, optional
+        Color map to use for the coloring
+    cut : integer, optional
+        If given and if we are plotting hr-regions, this will divide
+        the coloring into two different groups (see `.add_regions`).
+    **kwargs : matplotlib.lines.Line2D properties, optional
+        Extra properties for the plotting passed to the ``axi.plot``
+        method.
+
+    Returns
+    -------
+    fig: object like :py:class:`matplotlib.figure.Figure`
+        The figure created here.
+
+    """
+    fig, ax1 = set_up_figure(track)
+    xdata = _get_data(data, xvar)
+    ydata = _get_data(data, yvar)
+    zdata = _get_data(data, zvar)
+    ax1.set(xlabel=RELABEL.get(xvar, xvar), ylabel=RELABEL.get(yvar, yvar))
+    ax1.plot(xdata, ydata, **kwargs)
+
+    if zvar == 'hr-regions':
+        add_regions(ax1, xdata, ydata, data[zvar], cut)
+    else:
+        poly, _, _, norm = make_patches(
+            xdata,
+            ydata,
+            zdata,
+            cmap_name=cmap,
+        )
+        col = ax1.add_collection(poly)
+        add_colorbar(fig, ax1, col, zvar, norm)
+
+    _update_time_ticklabels(ax1, xvar, yvar, xdata, ydata)
     return fig
-
-
-def save_map(fig, name, tile='norgeskart_topo4'):
-    """Just store a map."""
-    mplleaflet.show(path=name, fig=fig, tiles=tile)
-
-
-monkey_patch_tiles(tiles)

@@ -1,7 +1,21 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2020, Anders Lervik.
+# Copyright (c) 2021, Anders Lervik.
 # Distributed under the LGPLv2.1+ License. See LICENSE for more info.
 """This module defines common methods for gpxplotter."""
+
+
+# Define heart-rate limits:
+HR_LIMITS = [(0.5, 0.6), (0.6, 0.7), (0.7, 0.8), (0.8, 0.9), (0.9, 1.0)]
+
+# For adding text:
+RELABEL = {
+    'hr': 'Heart rate / bpm',
+    'distance': 'Distance / m',
+    'time': 'Time',
+    'elevation': 'Elevation / m',
+    'hr-zone-frac': 'Fraction of maximum heart rate',
+    'hr-zone-float': 'Heart rate zone',
+}
 
 
 def heart_rate_zones(pulse, maxpulse=187):
@@ -33,18 +47,18 @@ def heart_rate_zones(pulse, maxpulse=187):
     return zone, int(zone), frac
 
 
-def heart_rate_zone_limits(maxpulse=187):
+def heart_rate_zone_limits(maxpulse=187, lims=None):
     """Return the limits for the heart rate zones."""
-    lims = [(0.5, 0.6), (0.6, 0.7), (0.7, 0.8), (0.8, 0.9), (0.9, 1.0)]
+    if lims is None:
+        lims = HR_LIMITS
     return [(maxpulse * i[0], maxpulse * i[1]) for i in lims]
 
 
 def format_time_delta(time_delta):
-    """Create string after formatting time deltas."""
+    """Format time deltas as strings on the form hh:mm:ss."""
     timel = []
     for i in time_delta:
         hours, res = divmod(i, 3600)
         minutes, seconds = divmod(res, 60)
-        timel.append('{:02d}:{:02d}:{:02d}'.format(int(hours), int(minutes),
-                                                   int(seconds)))
+        timel.append(f'{int(hours):02d}:{int(minutes):02d}:{int(seconds):02d}')
     return timel
