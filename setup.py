@@ -34,8 +34,8 @@ FULL_VERSION = '0.1.0.dev0'  # Automatically set by setup_version.py
 def get_long_description():
     """Hard-coded long description."""
     long_description = (
-        'gpxplotter is a small package for generating '
-        '.gpx files and creating simple using '
+        'gpxplotter is a small package for reading'
+        '.gpx files and creating simple plots using '
         '`matplotlib <https://www.matplotlib.org/>`_ and simple maps '
         'using `folium <https://python-visualization.github.io/folium/>`_. '
         'The gpxplotter documentation can be found at `{docs} <{docs}>`_'
