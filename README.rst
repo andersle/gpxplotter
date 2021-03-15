@@ -58,6 +58,7 @@ Simple example for showing a track in a map, colored by heart rate
    :align: center
    :target: examples/html/map_001.html
 
+[go](examples/html/map_001.html){:target="_blank"}
 
 
 
