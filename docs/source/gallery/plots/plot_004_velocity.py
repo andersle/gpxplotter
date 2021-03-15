@@ -14,9 +14,6 @@ plt.style.use('seaborn-talk')
 
 for track in read_gpx_file('example1.gpx'):
     for i, segment in enumerate(track['segments']):
-        # Convert m -> km:
-        segment['Distance / km'] = segment['distance'] / 1000.
-        segment['Velocity / km/h'] = segment['velocity'] * 3.6
         # Plot elevation as function of distance:
         plot_filled(track, segment, xvar='Distance / km', yvar='elevation',
                     zvar='Velocity / km/h')

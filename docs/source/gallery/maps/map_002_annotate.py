@@ -18,7 +18,7 @@ for track in read_gpx_file('example1.gpx'):
     for i, segment in enumerate(track['segments']):
         # Add track to the map:
         add_segment_to_map(the_map, segment, color_by='elevation')
-        
+
         # This is sufficient to add the segment to the map.
         # Here we will add some extra markers using folium:
         # 1) Add marker at highest elevation:

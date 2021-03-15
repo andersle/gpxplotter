@@ -331,6 +331,7 @@ def read_gpx_file(gpxfile, maxpulse=187):
             data['distance'] = np.array(
                 get_distances(data['lat'], data['lon'])
             )
+            data['Distance / km'] = data['distance'] / 1000.
             data['average-hr'] = (
                 np.trapz(data['hr'], data['elapsed-time']) /
                 (data['elapsed-time'][-1] - data['elapsed-time'][0])
@@ -341,6 +342,8 @@ def read_gpx_file(gpxfile, maxpulse=187):
             data['velocity'] = approximate_velocity(
                 data['distance'], data['elapsed-time']
             )
-            data['pace'] = 1.0 / ((60. / 1000) * data['velocity'])
             data['Velocity / km/h'] = 3.6 * data['velocity']
+            idx = np.where(data['velocity'] > 0)[0]
+            data['pace'] = np.zeros_like(data['velocity'])
+            data['pace'][idx] = 1.0 / ((60. / 1000) * data['velocity'][idx])
         yield track_data

@@ -13,8 +13,6 @@ plt.style.use('seaborn-talk')
 
 for track in read_gpx_file('example1.gpx'):
     for i, segment in enumerate(track['segments']):
-        # Convert m -> km:
-        segment['Distance / km'] = segment['distance'] / 1000.
         # Plot elevation as function of distance:
         plot_line(track, segment, xvar='Distance / km', yvar='elevation')
         # Plot elevation as function of elapsed time:
