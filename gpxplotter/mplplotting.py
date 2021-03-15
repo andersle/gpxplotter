@@ -38,11 +38,11 @@ def make_patches(xdata, ydata, zdata, cmap_name='viridis'):
 
     Parameters
     ----------
-    xdata : list or numpy.array or similar
+    xdata : list or array_like
         The x positions for the curve.
-    ydata : list or numpy.array or similar
+    ydata : list or array_like
         The y positions for the curve.
-    zdata : list or numpy.array or similar
+    zdata : list or array_like
         A list of values associated with each point, used for
         coloring.
     cmap_name : string, optional
@@ -50,7 +50,7 @@ def make_patches(xdata, ydata, zdata, cmap_name='viridis'):
 
     Returns
     -------
-    out[0] : object like :py:class:`.PolyCollection`
+    out[0] : object like :py:class:`matplotlib.collections.PolyCollection`
         The polygons created here, with individual colors.
     out[1] : list of floats
         The colors associated with the given ``zdata``.
@@ -100,7 +100,25 @@ def _make_time_labels(delta_seconds, nlab=5):
 
 
 def set_up_figure(track):
-    """Helper method to create a figure."""
+    """Helper method to create a figure.
+
+    This method will just create the figure and axis and
+    set the title.
+
+    Parameters
+    ----------
+    track : dict
+        The track we are creating a figure for.
+
+
+    Returns
+    -------
+    fig: object like :py:class:`matplotlib.figure.Figure`
+        The figure created here.
+    axi : object like :py:class:`matplotlib.axes.Axes`
+        The axis created here
+
+    """
     fig, ax1 = plt.subplots(constrained_layout=True)
     ax1.set_title(f'{track["name"][0]}: {track["type"][0]}')
     return fig, ax1
@@ -119,7 +137,7 @@ def add_colorbar(figi, axi, patch, zvar, norm):
         The mappable described by the color bar.
     zvar : string
         The variable we are using for coloring.
-    norm :  matplotlib.colors.Normalize
+    norm :  :py:class:`matplotlib.colors.Normalize`
         The normalization of values for mapping to colors.
 
     """
@@ -140,9 +158,9 @@ def add_regions(axi, xdata, ydata, regions, cut):
     ----------
     axi : object like :py:class:`matplotlib.axes.Axes`
         The axes to add regions to.
-    xdata : object like :py:class:`numpy.array`
+    xdata : array_like
         The x-values we are plotting for.
-    ydata : object like :py:class:`numpy.array`
+    ydata : array_like
         The y-values we are plotting for.
     regions : list of lists
         regions[i] defines a heart rate region as [start, stop, hr-region].
@@ -218,11 +236,11 @@ def add_segmented_line(xdata, ydata, zdata, cmap='viridis'):
 
     Parameters
     ----------
-    xdata : object like :py:class:`numpy.array`
+    xdata : array_like
         x-positions to use.
-    ydata : object like :py:class:`numpy.array`
+    ydata : array_like
         y-positions to use.
-    zdata : object like :py:class:`numpy.array`
+    zdata : array_like
         Values to use for coloring the line segments.
     cmap : string, optional
         Colormap to use for the colors.
@@ -254,7 +272,7 @@ def _update_limits(axi, data, which='x', factor=0.025):
     ----------
     axi : object like :py:class:`matplotlib.axes.Axes`
         The axes to update for.
-    data : object like :py:class:`numpy.array`
+    data : array_like
         The data we are plotting on the given axes.
     which : string, optional
         Determines if we are updating the x or y-axes.
@@ -284,7 +302,7 @@ def _add_elapsed_labels(axi, data, which='x'):
     ----------
     axi : object like :py:class:`matplotlib.axes.Axes`
         The axes to add ticks for.
-    data : object like :py:class:`numpy.array`
+    data : array_like
         The data we are updating.
     which : string, optional
         Selects the axes (x or y) we are updating.

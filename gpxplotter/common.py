@@ -55,11 +55,10 @@ def heart_rate_zone_limits(maxpulse=187, lims=None):
 
 
 def format_time_delta(time_delta):
-    """Create string after formatting time deltas."""
+    """Format time deltas as strings on the form hh:mm:ss."""
     timel = []
     for i in time_delta:
         hours, res = divmod(i, 3600)
         minutes, seconds = divmod(res, 60)
-        timel.append('{:02d}:{:02d}:{:02d}'.format(int(hours), int(minutes),
-                                                   int(seconds)))
+        timel.append(f'{int(hours):02d}:{int(minutes):02d}:{int(seconds):02d}')
     return timel

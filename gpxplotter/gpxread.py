@@ -6,6 +6,7 @@ from xml.dom import minidom
 from math import atan, atan2, radians, tan, sin, cos, sqrt
 import dateutil.parser
 import numpy as np
+from scipy.interpolate import UnivariateSpline
 from gpxplotter.common import heart_rate_zones
 
 
@@ -273,6 +274,24 @@ def _get_gpx_text(track, tagname):
     return tag_txt
 
 
+def approximate_velocity(distance, time):
+    """Calculate approximate velocities.
+
+    This method will calculate approxiate velocities by
+    finding a spline and its derivative.
+
+    Parameters
+    ----------
+    distance : array_like
+        Distances measured as a function of time.
+    time : array_like
+        The accompanying time stamps for the velocities.
+
+    """
+    spline = UnivariateSpline(time, distance, k=1)
+    return spline.derivative()(time)
+
+
 def read_gpx_file(gpxfile, maxpulse=187):
     """Read data from a given gpx file.
 
@@ -316,4 +335,8 @@ def read_gpx_file(gpxfile, maxpulse=187):
             ele_diff = np.diff(data['elevation'])
             data['elevation-up'] = ele_diff[np.where(ele_diff > 0)[0]].sum()
             data['elevation-down'] = ele_diff[np.where(ele_diff < 0)[0]].sum()
+            data['velocity'] = approximate_velocity(
+                data['distance'], data['elapsed-time']
+            )
+            data['pace'] = 1.0 / ((60. / 1000) * data['velocity'])
         yield track_data
