@@ -56,7 +56,7 @@ Simple example for showing a track in a map, colored by heart rate
    :scale: 50 %
    :alt: Example output
    :align: center
-   :target: https://github.com/andersle/gpxplotter/blob/replace_mplleaflet/examples/html/map_001.html
+   :target: examples/html/map_001.html
 
 
 
