@@ -4,7 +4,6 @@
 """This module defines methods for interfacing with folium."""
 from math import ceil
 import folium
-#import folium.features
 import branca.colormap
 import numpy as np
 from gpxplotter.common import RELABEL
