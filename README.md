@@ -1,6 +1,7 @@
 # gpxplotter
 
 [![Documentation Status](https://readthedocs.org/projects/gpxplotter/badge/?version=latest)](https://gpxplotter.readthedocs.io/en/latest/?badge=latest)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/andersle/gpxplotter/master?filepath=%2Flectures)
 
 *gpxplotter* is a Python package for reading 
 [gpx](https://en.wikipedia.org/wiki/GPS_Exchange_Format)
@@ -24,11 +25,11 @@ gpxplotter can be installed via pip:
 
 ## Examples
 
-Interactive examples can be explored via 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/andersle/gpxplotter/master?filepath=%2Flectures)
+Interactive examples can be explored
+via [Binder](https://mybinder.org/v2/gh/andersle/gpxplotter/master?filepath=%2Flectures)
 
 
-### Simple example for showing a track in a map, colored by heart rate
+#### Simple example for showing a track in a map, colored by heart rate
 
 ```python
 
@@ -41,9 +42,6 @@ for track in read_gpx_file('ruten.gpx'):
 
 # To display the map in a Jupyter notebook:
 the_map
-
-# To store the map as a HTML page:
-the_map.save('map_001.html')
 ```
 
 [![map](examples/images/map001.png)](examples/html/map001.html)
