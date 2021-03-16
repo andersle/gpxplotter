@@ -12,7 +12,8 @@ and maps using
 
 Please see
 [https://gpxplotter.readthedocs.io/en/latest/](https://gpxplotter.readthedocs.io/en/latest/)
-for the latest documentation.
+for the latest documentation and the 
+[Binder notebook](https://mybinder.org/v2/gh/andersle/gpxplotter/master?filepath=examples%2Fjupyter%2Fexamples.ipynb) for examples.
 
 ## Installation
 
