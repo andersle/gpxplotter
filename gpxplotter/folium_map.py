@@ -99,7 +99,12 @@ def add_colored_line(the_map, segment, color_by, line_options=None):
     zdata = segment[color_by]
     avg = 0.5 * (zdata[1:] + zdata[:-1])
     minz, maxz = min(avg), max(avg)
-    colormap = branca.colormap.linear.viridis.scale(minz, maxz).to_step(10)
+    uniq = len(set(zdata))
+    if uniq < 10:
+        levels = uniq
+    else:
+        levels = 10
+    colormap = branca.colormap.linear.viridis.scale(minz, maxz).to_step(levels)
     colormap.caption = RELABEL.get(color_by, color_by)
     if line_options is None:
         line_options = {'weight': 6}

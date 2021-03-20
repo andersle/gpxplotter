@@ -6,7 +6,7 @@ import datetime
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.collections import PolyCollection, LineCollection
-from matplotlib.colors import Normalize
+from matplotlib.colors import Normalize, BoundaryNorm
 from matplotlib.cm import get_cmap
 import matplotlib.dates as mdates
 import matplotlib.patches as mpatches
@@ -43,13 +43,24 @@ def _select_cmap(zdata, cmap_name):
     cmap_name : string
         The name of the color map to use.
 
+    Returns
+    -------
+    cmap : object like :py:class:`matplotlib.colors.ListedColormap`
+        The created color map.
+    norm : object like :py:class:`matplotlib.colors.Normalize`
+        The created normalization for the data.
+
     """
     uniqz = len(set(zdata))
     if uniqz > 10:
         cmap = get_cmap(cmap_name)
+        norm = Normalize(vmin=floor(min(zdata)), vmax=ceil(max(zdata)))
     else:
         cmap = get_cmap(cmap_name, lut=uniqz)
-    return cmap
+        boundaries = list(sorted(set(zdata)))
+        boundaries = boundaries + [max(boundaries) + 1]
+        norm = BoundaryNorm(boundaries, uniqz, clip=True)
+    return cmap, norm
 
 
 def make_patches(xdata, ydata, zdata, cmap_name='viridis'):
@@ -69,19 +80,15 @@ def make_patches(xdata, ydata, zdata, cmap_name='viridis'):
 
     Returns
     -------
-    out[0] : object like :py:class:`matplotlib.collections.PolyCollection`
+    poly : object like :py:class:`matplotlib.collections.PolyCollection`
         The polygons created here, with individual colors.
-    out[1] : list of floats
-        The colors associated with the given ``zdata``.
-    out[2] : object like :py:class:`matplotlib.colors.ListedColormap`
+    cmap : object like :py:class:`matplotlib.colors.ListedColormap`
         The created color map.
-    out[3] : object like :py:class:`matplotlib.colors.Normalize`
+    norm : object like :py:class:`matplotlib.colors.Normalize`
         The created normalization for the data.
 
     """
-    cmap = _select_cmap(zdata, cmap_name)
-    norm = Normalize(vmin=floor(min(zdata)), vmax=ceil(max(zdata)))
-    colors = [cmap(norm(i)) for i in zdata]
+    cmap, norm = _select_cmap(zdata, cmap_name)
     verts = []
     for i, (xval, yval) in enumerate(zip(xdata, ydata)):
         if i == 0:
@@ -105,9 +112,9 @@ def make_patches(xdata, ydata, zdata, cmap_name='viridis'):
                 [xprev, 0], [xprev, yprev], [xval, yval],
                 [xnext, ynext], [xnext, 0]
             ])
-    col = PolyCollection(verts, facecolors=colors, edgecolors=colors,
-                         cmap=cmap)
-    return col, colors, cmap, norm
+    poly = PolyCollection(verts, cmap=cmap, norm=norm)
+    poly.set_array(zdata)
+    return poly, cmap, norm
 
 
 def _make_time_labels(delta_seconds, nlab=5):
@@ -141,33 +148,6 @@ def set_up_figure(track):
     fig, ax1 = plt.subplots(constrained_layout=True)
     ax1.set_title(f'{track["name"][0]}: {track["type"][0]}')
     return fig, ax1
-
-
-def add_colorbar(figi, axi, patch, zvar, norm):
-    """Add colorbar to figure.
-
-    Parameters
-    ----------
-    figi: object like :py:class:`matplotlib.figure.Figure`
-        The figure to add the color bar to.
-    axi : object like :py:class:`matplotlib.axes.Axes`
-        The axes to which we add the color bar next to.
-    patch : object like :py:class:`matplotlib.cm.ScalarMappable`
-        The mappable described by the color bar.
-    zvar : string
-        The variable we are using for coloring.
-    norm :  :py:class:`matplotlib.colors.Normalize`
-        The normalization of values for mapping to colors.
-
-    """
-    cbar = figi.colorbar(patch, ax=axi)
-    cbar.set_label(RELABEL.get(zvar, zvar))
-    ticks, ticks_pos = [], []
-    for i in cbar.get_ticks():
-        ticks.append(f'{norm.inverse(i):g}')
-        ticks_pos.append(i)
-    cbar.set_ticks(ticks_pos)
-    cbar.set_ticklabels(ticks)
 
 
 def add_regions(axi, xdata, ydata, regions, cut):
@@ -274,8 +254,7 @@ def add_segmented_line(xdata, ydata, zdata, cmap_name='viridis'):
     https://matplotlib.org/stable/gallery/lines_bars_and_markers/multicolored_line.html
 
     """
-    cmap = _select_cmap(zdata, cmap_name)
-    norm = Normalize(min(zdata), max(zdata))
+    cmap, norm = _select_cmap(zdata, cmap_name)
     points = np.array([xdata, ydata]).T.reshape(-1, 1, 2)
     segments = np.concatenate([points[:-1], points[1:]], axis=1)
     lines = LineCollection(segments, cmap=cmap, norm=norm)
@@ -386,18 +365,43 @@ def _update_time_ticklabels(axi, xvar, yvar, xdata, ydata):
         The data used for the y-axis.
 
     """
-    # Add nicer labels if we have elapsed-time:
+    fmt = mdates.DateFormatter("%H:%M:%S")
     if xvar == 'elapsed-time':
         _add_elapsed_labels(axi, xdata, which='x')
-    elif xvar == 'time':
-        fmt = mdates.DateFormatter("%H:%M:%S")
+    elif xvar in ('time',):
         axi.xaxis.set_major_formatter(fmt)
         axi.tick_params(axis='x', rotation=25)
     if yvar == 'elapsed-time':
         _add_elapsed_labels(axi, ydata, which='y')
-    elif yvar == 'time':
-        fmt = mdates.DateFormatter("%H:%M:%S")
+    elif yvar in ('time',):
         axi.yaxis.set_major_formatter(fmt)
+
+
+def fix_elapsed_time(axi, var, data_axes, data_plot, which='x'):
+    """For labels for time when elapsed time is used in plotting.
+
+    For colorling plots, the elapsed time data is used for making lines
+    or polygons. This method will shift the labels back to the original
+    variable.
+
+    Parameters
+    ----------
+    axi : object like :py:class:`matplotlib.axes.Axes`
+        The axes to add ticks for.
+    var : string
+        The variable used for the axis.
+    data_axes : array_like
+        The data we are to use for making labels.
+    data_plot : array_like
+        The actual data used for plotting.
+    which : string, optional
+        Selects the axes (x or y) we are updating.
+
+    """
+    if var in ('time', 'elapsed-time'):
+        _add_elapsed_labels(axi, data_plot, which=which)
+        if var == 'time':
+            _shift_elapsed_labels(axi, data_axes[0], which=which)
 
 
 def plot_line(track, data, xvar='distance', yvar='elevation', zvar=None,
@@ -429,6 +433,8 @@ def plot_line(track, data, xvar='distance', yvar='elevation', zvar=None,
     -------
     fig: object like :py:class:`matplotlib.figure.Figure`
         The figure created here.
+    ax1 : object like :py:class:`matplotlib.axes.Axes`
+        The axes to add ticks for.
 
     """
     fig, ax1 = set_up_figure(track)
@@ -437,12 +443,13 @@ def plot_line(track, data, xvar='distance', yvar='elevation', zvar=None,
     ax1.set(xlabel=RELABEL.get(xvar, xvar), ylabel=RELABEL.get(yvar, yvar))
     if zvar is None:
         ax1.plot(xdata, ydata, **kwargs)
+        _update_time_ticklabels(ax1, xvar, yvar, xdata, ydata)
     else:
         zdata = _get_data(data, zvar)
         # For time, use the elapsed-time for making the segmented line
-        if xvar == 'time':
+        if xvar in ('time',):
             xdata = _get_data(data, 'elapsed-time')
-        if yvar == 'time':
+        if yvar in ('time',):
             ydata = _get_data(data, 'elapsed-time')
         lines = add_segmented_line(xdata, ydata, zdata, cmap_name=cmap)
         lines.set_linewidth(kwargs.get('lw', 3))
@@ -452,16 +459,9 @@ def plot_line(track, data, xvar='distance', yvar='elevation', zvar=None,
         cbar = fig.colorbar(line, ax=ax1)
         cbar.set_label(RELABEL.get(zvar, zvar))
         # Shift back for time:
-        if xvar == 'time':
-            _add_elapsed_labels(ax1, xdata, which='x')
-            xdata = _get_data(data, xvar)
-            _shift_elapsed_labels(ax1, xdata[0], which='x')
-        if yvar == 'time':
-            _add_elapsed_labels(ax1, ydata, which='y')
-            ydata = _get_data(data, yvar)
-            _shift_elapsed_labels(ax1, ydata[0], which='y')
-    _update_time_ticklabels(ax1, xvar, yvar, xdata, ydata)
-    return fig
+        fix_elapsed_time(ax1, xvar, _get_data(data, xvar), xdata, which='x')
+        fix_elapsed_time(ax1, yvar, _get_data(data, yvar), ydata, which='y')
+    return fig, ax1
 
 
 def plot_filled(track, data, xvar='distance', yvar='elevation', zvar='hr',
@@ -495,6 +495,8 @@ def plot_filled(track, data, xvar='distance', yvar='elevation', zvar='hr',
     -------
     fig: object like :py:class:`matplotlib.figure.Figure`
         The figure created here.
+    ax1 : object like :py:class:`matplotlib.axes.Axes`
+        The axes to add ticks for.
 
     """
     fig, ax1 = set_up_figure(track)
@@ -506,15 +508,25 @@ def plot_filled(track, data, xvar='distance', yvar='elevation', zvar='hr',
 
     if zvar == 'hr-regions':
         add_regions(ax1, xdata, ydata, data[zvar], cut)
+        _update_time_ticklabels(ax1, xvar, yvar, xdata, ydata)
     else:
-        poly, _, _, norm = make_patches(
+        # For time, use the elapsed-time for making the filled plot
+        if xvar in ('time',):
+            xdata = _get_data(data, 'elapsed-time')
+        if yvar in ('time',):
+            ydata = _get_data(data, 'elapsed-time')
+        poly, _, _ = make_patches(
             xdata,
             ydata,
             zdata,
             cmap_name=cmap,
         )
         col = ax1.add_collection(poly)
-        add_colorbar(fig, ax1, col, zvar, norm)
-
-    _update_time_ticklabels(ax1, xvar, yvar, xdata, ydata)
-    return fig
+        _update_limits(ax1, xdata, which='x')
+        _update_limits(ax1, ydata, which='y')
+        cbar = fig.colorbar(col, ax=ax1)
+        cbar.set_label(RELABEL.get(zvar, zvar))
+        # Shift labels for time:
+        fix_elapsed_time(ax1, xvar, _get_data(data, xvar), xdata, which='x')
+        fix_elapsed_time(ax1, yvar, _get_data(data, yvar), ydata, which='y')
+    return fig, ax1

@@ -12,9 +12,11 @@ RELABEL = {
     'hr': 'Heart rate / bpm',
     'distance': 'Distance / m',
     'time': 'Time',
+    'elapsed-time': 'Elapsed time',
     'elevation': 'Elevation / m',
     'hr-zone-frac': 'Fraction of maximum heart rate',
     'hr-zone-float': 'Heart rate zone',
+    'velocity-level': 'Velocity',
 }
 
 

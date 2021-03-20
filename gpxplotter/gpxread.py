@@ -268,9 +268,9 @@ def process_segment(segment, max_heart_rate=187):
     # Process time information:
     if 'time' in segment:
         time_zero = segment['time'][0]
-        segment['time-delta'] = [i - time_zero for i in segment['time']]
+        time_delta = [i - time_zero for i in segment['time']]
         segment['elapsed-time'] = np.array(
-                [i.total_seconds() for i in segment['time-delta']],
+                [i.total_seconds() for i in time_delta],
                 dtype=np.int_
         )
     # Calculate distance:
