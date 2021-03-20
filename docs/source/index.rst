@@ -6,7 +6,7 @@ Welcome to |gpxplotter|'s documentation!
 generating plots using `matplotlib <https://www.matplotlib.org/>`_
 and maps using `folium <https://python-visualization.github.io/folium/>`_:
 
-.. literalinclude:: gallery/maps/map_001_heart_rate.py
+.. literalinclude:: gallery/maps/plot_001_heart_rate.py
    :lines: 10-
 
 .. raw:: html
@@ -17,7 +17,7 @@ and maps using `folium <https://python-visualization.github.io/folium/>`_:
 Using `folium <https://python-visualization.github.io/folium/>`_, the maps can
 be annotated:
 
-.. literalinclude:: gallery/maps/map_002_annotate.py
+.. literalinclude:: gallery/maps/plot_002_annotate.py
    :lines: 3-
 
 

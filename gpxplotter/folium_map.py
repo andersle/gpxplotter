@@ -80,7 +80,8 @@ def add_start_top_markers(the_map, segment):
     stop.add_to(the_map)
 
 
-def add_segment_to_map(the_map, segment, color_by=None, line_options=None):
+def add_segment_to_map(the_map, segment, color_by=None, cmap='viridis',
+                       line_options=None):
     """Add a segment as a line to a map."""
     if color_by is None:
         if line_options is None:
@@ -88,23 +89,24 @@ def add_segment_to_map(the_map, segment, color_by=None, line_options=None):
         line = folium.features.PolyLine(segment['latlon'], **line_options)
         line.add_to(the_map)
     else:
-        add_colored_line(the_map, segment, color_by)
+        add_colored_line(the_map, segment, color_by, cmap=cmap, line_options=line_options)
     add_start_top_markers(the_map, segment)
     boundary = the_map.get_bounds()
     the_map.fit_bounds(boundary, padding=(3, 3))
 
 
-def add_colored_line(the_map, segment, color_by, line_options=None):
+def add_colored_line(the_map, segment, color_by, cmap='viridis', line_options=None):
     """Add segment as a colored line to a map."""
     zdata = segment[color_by]
     avg = 0.5 * (zdata[1:] + zdata[:-1])
     minz, maxz = min(avg), max(avg)
     uniq = len(set(zdata))
     if uniq < 10:
-        levels = uniq
+        levels = uniq + 1
     else:
         levels = 10
-    colormap = branca.colormap.linear.viridis.scale(minz, maxz).to_step(levels)
+    linmap = getattr(branca.colormap.linear, cmap)
+    colormap = linmap.scale(minz, maxz).to_step(levels)
     colormap.caption = RELABEL.get(color_by, color_by)
     if line_options is None:
         line_options = {'weight': 6}

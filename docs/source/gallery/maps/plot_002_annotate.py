@@ -13,7 +13,7 @@ import folium
 import numpy as np
 
 
-the_map = create_folium_map()
+the_map = create_folium_map(tiles='openstreetmap')
 for track in read_gpx_file('example1.gpx'):
     for i, segment in enumerate(track['segments']):
         # Add track to the map:
@@ -65,8 +65,8 @@ for track in read_gpx_file('example1.gpx'):
         high_hr.add_to(the_map)
 
 
-# To display the map in a Jupyter notebook:
-the_map
-
 # To store the map as a HTML page:
 the_map.save('map_002.html')
+
+# To display the map in a Jupyter notebook:
+the_map
