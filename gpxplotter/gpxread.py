@@ -6,19 +6,13 @@ from math import atan, atan2, radians, tan, sin, cos, sqrt
 import dateutil.parser
 import numpy as np
 from scipy.interpolate import UnivariateSpline
-from gpxplotter.common import heart_rate_zones
-
-
-def date_format(string):
-    """Conversions for date strings."""
-    timeobj = dateutil.parser.parse(string)
-    return timeobj
+from gpxplotter.common import update_hr_zones, cluster_velocities
 
 
 EXTRACT = {
-    'time': {'key': 'time', 'formatter': date_format},
+    'time': {'key': 'time', 'formatter': dateutil.parser.parse},
     'temp': {'key': 'ns3:atemp', 'formatter': float},
-    'hr': {'key': 'ns3:hr', 'formatter': float},
+    'hr': {'key': 'ns3:hr', 'formatter': int},
     'cad': {'key': 'ns3:cad', 'formatter': float},
 }
 
@@ -162,15 +156,13 @@ def get_point_data(point):
     return data
 
 
-def read_segment(segment, maxpulse=187):
-    """Read points in a segment and return data for plotting.
+def read_segment(segment):
+    """Read raw gpx-data for a segment.
 
     Parameters
     ----------
     segment : object like :py:class:`xml.dom.minidom.Element`
         The sement we are about to read data from.
-    maxpulse : integer
-        The maximum heart rate to use in calculations of heart rate zones.
 
     Returns
     -------
@@ -195,43 +187,9 @@ def read_segment(segment, maxpulse=187):
     for key, val in data.items():
         if key not in ('time', 'hr'):
             data[key] = np.array(val)
-    if 'time' in data:
-        data['time-delta'] = [i - data['time'][0] for i in data['time']]
     if 'hr' in data:
         data['hr'] = np.array(data['hr'], dtype=np.int_)
-        data['heart rate'] = data['hr']
-
-    data['latlon'] = list(zip(data['lat'], data['lon']))
-
-    hrzone = [heart_rate_zones(i, maxpulse=maxpulse) for i in data['hr']]
-    data['hr-zone'] = np.array([i[1] for i in hrzone], dtype=np.int_)
-    data['hr-zone-float'] = np.array([i[0] for i in hrzone])
-    data['hr-zone-frac'] = np.array([i[2] for i in hrzone])
     return data
-
-
-def find_regions(yval):
-    """Find borders for regions with equal values."""
-    regions = []
-    region_y = None
-    i = None
-    for i, ypos in enumerate(yval):
-        if region_y is None:
-            region_y = ypos
-        if ypos != region_y:
-            regions.append([i, region_y])
-            region_y = ypos
-    # for adding the last region
-    if i is not None:
-        regions.append([i, region_y])
-    new_regions = []
-    for i, region in enumerate(regions):
-        if i == 0:
-            reg = [0, region[0], region[1]]
-        else:
-            reg = [regions[i-1][0], region[0], region[1]]
-        new_regions.append(reg)
-    return new_regions
 
 
 def get_distances(lat, lon):
@@ -287,57 +245,81 @@ def approximate_velocity(distance, time):
         The accompanying time stamps for the velocities.
 
     """
-    spline = UnivariateSpline(time, distance, k=1)
+    spline = UnivariateSpline(time, distance, k=3)
     vel = spline.derivative()(time)
     idx = np.where(vel < 0)[0]
     vel[idx] = 0.0
     return vel
 
 
-class Property:
-    """Represent a property to handle units.
+def process_segment(segment, max_heart_rate=187):
+    """Add derived properties to the given segment.
 
-    A generic object that represents a measured property with
-    units and the type of plots the property can be used for (i. e.
-    what types of plots it can be used for.
-
-    Attributes
+    Parameters
     ----------
-    description : string
-        Description of the property.
-    unit : string
-        The unit of the property.
-    val : array_like
-        The measured values for this property.
+    segment : dict
+        The raw data from the gpx file.
+    max_heart_rate : float, optional
+        The maximum heart rate, used for calculation of
+        heart rate zones.
 
     """
+    segment['latlon'] = list(zip(segment['lat'], segment['lon']))
+    # Process time information:
+    if 'time' in segment:
+        time_zero = segment['time'][0]
+        segment['time-delta'] = [i - time_zero for i in segment['time']]
+        segment['elapsed-time'] = np.array(
+                [i.total_seconds() for i in segment['time-delta']],
+                dtype=np.int_
+        )
+    # Calculate distance:
+    segment['distance'] = np.array(
+        get_distances(segment['lat'], segment['lon'])
+    )
+    segment['Distance / km'] = segment['distance'] / 1000.
+    # Estimate velocity:
+    if 'distance' in segment and 'elapsed-time' in segment:
+        # Velocity i m / s
+        segment['velocity'] = approximate_velocity(
+                segment['distance'],
+                segment['elapsed-time']
+        )
+        segment['Velocity / km/h'] = 3.6 * segment['velocity']
+        # Pace in min / km, as float
+        idx = np.where(segment['velocity'] > 0)[0]
+        segment['pace'] = np.zeros_like(segment['velocity'])
+        segment['pace'][idx] = 1.0 / ((60. / 1000) * segment['velocity'][idx])
+        # Add velocity levels:
+        segment['velocity-level'] = cluster_velocities(segment['velocity'])
+    # Add hr metrics:
+    if 'hr' in segment:
+        update_hr_zones(segment, max_heart_rate=max_heart_rate)
+        if 'elapsed-time' in segment:
+            delta_time = (
+                segment['elapsed-time'][-1] - segment['elapsed-time'][0]
+                )
+            segment['average-hr'] = (
+                np.trapz(segment['hr'], segment['elapsed-time']) / delta_time
+            )
+    # Add elevation metrics:
+    if 'elevation' in segment:
+        ele_diff = np.diff(segment['elevation'])
+        segment['elevation-up'] = sum(ele_diff[np.where(ele_diff > 0)[0]])
+        segment['elevation-down'] = sum(ele_diff[np.where(ele_diff < 0)[0]])
+    # Add alias:
+    if 'hr' in segment:
+        segment['heart rate'] = segment['hr']
 
-    def __init__(self, val, description='Generic property', unit=None):
-        """Initialise the property.
 
-        Parameters
-        ----------
-        val : array_like
-            The measured values for this property
-        description: string, optional
-            Description of the object
-        unit : string, optional
-            The unit of this property.
-
-        """
-        self.description = description
-        self.val = val
-        self.unit = unit
-
-
-def read_gpx_file(gpxfile, maxpulse=187):
+def read_gpx_file(gpxfile, max_heart_rate=187):
     """Read data from a given gpx file.
 
     Parameters
     ----------
     gpxfile : string
         The file to open and read.
-    maxpulse : integer
+    max_heart_rate : integer (or float)
         The maximum pulse. Used in calculation of heat rate zones.
 
     Yields
@@ -350,36 +332,13 @@ def read_gpx_file(gpxfile, maxpulse=187):
     gpx = minidom.parse(gpxfile)
     tracks = gpx.getElementsByTagName('trk')
     for track in tracks:
-        segments = track.getElementsByTagName('trkseg')
+        raw_segments = track.getElementsByTagName('trkseg')
         track_data = {
             'name': _get_gpx_text(track, 'name'),
             'type': _get_gpx_text(track, 'type'),
-            'segments': [read_segment(i, maxpulse=maxpulse) for i in segments],
+            'segments': [read_segment(i) for i in raw_segments],
         }
-        print(track_data['segments'][0].keys())
         # Add some more processed data for segments
-        for data in track_data['segments']:
-            data['hr-regions'] = find_regions(data['hr-zone'])
-            data['elapsed-time'] = np.array(
-                [i.total_seconds() for i in data['time-delta']],
-                dtype=np.int_
-            )
-            data['distance'] = np.array(
-                get_distances(data['lat'], data['lon'])
-            )
-            data['Distance / km'] = data['distance'] / 1000.
-            data['average-hr'] = (
-                np.trapz(data['hr'], data['elapsed-time']) /
-                (data['elapsed-time'][-1] - data['elapsed-time'][0])
-            )
-            ele_diff = np.diff(data['elevation'])
-            data['elevation-up'] = ele_diff[np.where(ele_diff > 0)[0]].sum()
-            data['elevation-down'] = ele_diff[np.where(ele_diff < 0)[0]].sum()
-            data['velocity'] = approximate_velocity(
-                data['distance'], data['elapsed-time']
-            )
-            data['Velocity / km/h'] = 3.6 * data['velocity']
-            idx = np.where(data['velocity'] > 0)[0]
-            data['pace'] = np.zeros_like(data['velocity'])
-            data['pace'][idx] = 1.0 / ((60. / 1000) * data['velocity'][idx])
+        for segment in track_data['segments']:
+            process_segment(segment, max_heart_rate=max_heart_rate)
         yield track_data

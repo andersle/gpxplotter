@@ -33,6 +33,25 @@ ZONE_COLORS = {
 }
 
 
+def _select_cmap(zdata, cmap_name):
+    """Selects if the color map should be discrete or not.
+
+    Parameters
+    ----------
+    zdata ; array_like
+        The data used for creating the color map.
+    cmap_name : string
+        The name of the color map to use.
+
+    """
+    uniqz = len(set(zdata))
+    if uniqz > 10:
+        cmap = get_cmap(cmap_name)
+    else:
+        cmap = get_cmap(cmap_name, lut=uniqz)
+    return cmap
+
+
 def make_patches(xdata, ydata, zdata, cmap_name='viridis'):
     """Make some patches for multi-coloring the area under a curve.
 
@@ -60,7 +79,7 @@ def make_patches(xdata, ydata, zdata, cmap_name='viridis'):
         The created normalization for the data.
 
     """
-    cmap = get_cmap(cmap_name)
+    cmap = _select_cmap(zdata, cmap_name)
     norm = Normalize(vmin=floor(min(zdata)), vmax=ceil(max(zdata)))
     colors = [cmap(norm(i)) for i in zdata]
     verts = []
@@ -87,7 +106,7 @@ def make_patches(xdata, ydata, zdata, cmap_name='viridis'):
                 [xnext, ynext], [xnext, 0]
             ])
     col = PolyCollection(verts, facecolors=colors, edgecolors=colors,
-                         cmap=cmap_name)
+                         cmap=cmap)
     return col, colors, cmap, norm
 
 
@@ -229,7 +248,7 @@ def _get_data(data, key):
     return kdata
 
 
-def add_segmented_line(xdata, ydata, zdata, cmap='viridis'):
+def add_segmented_line(xdata, ydata, zdata, cmap_name='viridis'):
     """Create multicolored line.
 
     Create a multicolored line colored after the zdata-values.
@@ -242,7 +261,7 @@ def add_segmented_line(xdata, ydata, zdata, cmap='viridis'):
         y-positions to use.
     zdata : array_like
         Values to use for coloring the line segments.
-    cmap : string, optional
+    cmap_name : string, optional
         Colormap to use for the colors.
 
     Returns
@@ -255,6 +274,7 @@ def add_segmented_line(xdata, ydata, zdata, cmap='viridis'):
     https://matplotlib.org/stable/gallery/lines_bars_and_markers/multicolored_line.html
 
     """
+    cmap = _select_cmap(zdata, cmap_name)
     norm = Normalize(min(zdata), max(zdata))
     points = np.array([xdata, ydata]).T.reshape(-1, 1, 2)
     segments = np.concatenate([points[:-1], points[1:]], axis=1)
@@ -381,7 +401,7 @@ def _update_time_ticklabels(axi, xvar, yvar, xdata, ydata):
 
 
 def plot_line(track, data, xvar='distance', yvar='elevation', zvar=None,
-              **kwargs):
+              cmap='viridis', **kwargs):
     """Plot line data from a segment.
 
     Plot a given segment from a track as a line. The line
@@ -399,6 +419,8 @@ def plot_line(track, data, xvar='distance', yvar='elevation', zvar=None,
         Selects the variable to use for the y-axes.
     zvar : string, optional
         Selects the variable to use for coloring the line.
+    cmap : string, optional
+        Color map to use for the coloring
     **kwargs : matplotlib.lines.Line2D properties, optional
         Extra properties for the plotting passed to the ``axi.plot``
         method.
@@ -422,7 +444,7 @@ def plot_line(track, data, xvar='distance', yvar='elevation', zvar=None,
             xdata = _get_data(data, 'elapsed-time')
         if yvar == 'time':
             ydata = _get_data(data, 'elapsed-time')
-        lines = add_segmented_line(xdata, ydata, zdata, cmap='viridis')
+        lines = add_segmented_line(xdata, ydata, zdata, cmap_name=cmap)
         lines.set_linewidth(kwargs.get('lw', 3))
         line = ax1.add_collection(lines)
         _update_limits(ax1, xdata, which='x')

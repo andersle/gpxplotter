@@ -5,6 +5,7 @@ matplotlib
 numpy
 python-dateutil
 scipy
+sklearn
 sphinx
 sphinx_rtd_theme
 sphinx-gallery
