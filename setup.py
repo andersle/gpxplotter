@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) 2021, Anders Lervik.
 # Distributed under the LGPLv2.1+ License. See LICENSE for more info.
 """
@@ -28,7 +27,7 @@ from setuptools import setup, find_packages
 GITHUB = 'https://github.com/andersle/gpxplotter'
 DOCS = 'https://gpxplotter.readthedocs.io/en/latest'
 
-FULL_VERSION = '0.1.1'  # Automatically set by setup_version.py
+FULL_VERSION = '0.2.0'  # Automatically set by setup_version.py
 
 
 def get_long_description():
