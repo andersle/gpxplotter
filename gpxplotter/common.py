@@ -16,6 +16,7 @@ RELABEL = {
     'elevation': 'Elevation / m',
     'hr-zone-frac': 'Fraction of maximum heart rate',
     'hr-zone-float': 'Heart rate zone',
+    'hr-zone': 'Heart rate zone',
     'velocity-level': 'Velocity (slower -> faster)',
 }
 
