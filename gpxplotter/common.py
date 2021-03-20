@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) 2021, Anders Lervik.
 # Distributed under the LGPLv2.1+ License. See LICENSE for more info.
 """This module defines common methods for gpxplotter."""

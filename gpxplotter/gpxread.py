@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) 2021, Anders Lervik.
 # Distributed under the LGPLv2.1+ License. See LICENSE for more info.
 """This module defines methods for reading data from GPX files."""
@@ -295,6 +294,42 @@ def approximate_velocity(distance, time):
     return vel
 
 
+class Property:
+    """Represent a property to handle units.
+
+    A generic object that represents a measured property with
+    units and the type of plots the property can be used for (i. e.
+    what types of plots it can be used for.
+
+    Attributes
+    ----------
+    description : string
+        Description of the property.
+    unit : string
+        The unit of the property.
+    val : array_like
+        The measured values for this property.
+
+    """
+
+    def __init__(self, val, description='Generic property', unit=None):
+        """Initialise the property.
+
+        Parameters
+        ----------
+        val : array_like
+            The measured values for this property
+        description: string, optional
+            Description of the object
+        unit : string, optional
+            The unit of this property.
+
+        """
+        self.description = description
+        self.val = val
+        self.unit = unit
+
+
 def read_gpx_file(gpxfile, maxpulse=187):
     """Read data from a given gpx file.
 
@@ -321,6 +356,7 @@ def read_gpx_file(gpxfile, maxpulse=187):
             'type': _get_gpx_text(track, 'type'),
             'segments': [read_segment(i, maxpulse=maxpulse) for i in segments],
         }
+        print(track_data['segments'][0].keys())
         # Add some more processed data for segments
         for data in track_data['segments']:
             data['hr-regions'] = find_regions(data['hr-zone'])
