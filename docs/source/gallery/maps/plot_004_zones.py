@@ -1,8 +1,8 @@
 # Copyright (c) 2021, Anders Lervik.
 # Distributed under the LGPLv2.1+ License. See LICENSE for more info.
 """
-Color by heart rate zones
-=========================
+Track colored by heart rate zones
+=================================
 
 This example will create a map and color the track according
 to heart rate zones.
