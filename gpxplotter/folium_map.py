@@ -61,7 +61,16 @@ def create_folium_map(**kwargs):
 
 
 def add_start_top_markers(the_map, segment):
-    """Add markers for the start and end of the segment."""
+    """Add markers for the start and end of the segment.
+
+    Parameters
+    ----------
+    the_map : object like :py:class:`folium.folium.Map`
+        The map to add the markers to.
+    segment : dict
+        The segment to use for finding the start and end points.
+
+    """
     start_time = segment['time'][0].strftime('%A %B %d, %Y: %H:%M:%S')
     start = folium.Marker(
         location=segment['latlon'][0],
@@ -81,22 +90,72 @@ def add_start_top_markers(the_map, segment):
 
 
 def add_segment_to_map(the_map, segment, color_by=None, cmap='viridis',
-                       line_options=None):
-    """Add a segment as a line to a map."""
+                       line_options=None, fit_bounds=True, add_start_end=True):
+    """Add a segment as a line to a map.
+
+    This method will add a segment as a line to the given map. The line
+    can be colored according to values selected by the parameter
+    ``color_by``.
+
+    Parameters
+    ----------
+    the_map : object like :py:class:`folium.folium.Map`
+        The map to add the segment to.
+    segment : dict
+        The segment to add.
+    color_by : string, optional
+        This string selects what property we will color the segment
+        according to. If this is None, the segment will be displayed
+        with a single color.
+    cmap : string
+        The colormap to use if ``color_by != None``.
+    line_options : dict
+        Extra control options for drawing the line.
+    fit_bounds : boolean, optional
+        Determines if we try to fit the map so the whole segment
+        is shown.
+    add_start_end : boolean, optional
+        If True, this method will add markers at the start/end of the
+        segment.
+
+    """
     if color_by is None:
         if line_options is None:
             line_options = {}
         line = folium.features.PolyLine(segment['latlon'], **line_options)
         line.add_to(the_map)
     else:
-        add_colored_line(the_map, segment, color_by, cmap=cmap, line_options=line_options)
-    add_start_top_markers(the_map, segment)
-    boundary = the_map.get_bounds()
-    the_map.fit_bounds(boundary, padding=(3, 3))
+        add_colored_line(the_map, segment, color_by, cmap=cmap,
+                         line_options=line_options)
+    if add_start_end:
+        add_start_top_markers(the_map, segment)
+    if fit_bounds:
+        boundary = the_map.get_bounds()
+        the_map.fit_bounds(boundary, padding=(3, 3))
 
 
-def add_colored_line(the_map, segment, color_by, cmap='viridis', line_options=None):
-    """Add segment as a colored line to a map."""
+def add_colored_line(the_map, segment, color_by, cmap='viridis',
+                     line_options=None):
+    """Add segment as a colored line to a map.
+
+    Add a line colored by some value to the given map.
+
+    Parameters
+    ----------
+    the_map : object like :py:class:`folium.folium.Map`
+        The map to add the segment to.
+    segment : dict
+        The segment to add.
+    color_by : string, optional
+        This string selects what property we will color the segment
+        according to. If this is None, the segment will be displayed
+        with a single color.
+    cmap : string
+        The colormap to use if ``color_by != None``.
+    line_options : dict
+        Extra control options for drawing the line.
+
+    """
     zdata = segment[color_by]
     avg = 0.5 * (zdata[1:] + zdata[:-1])
     minz, maxz = min(avg), max(avg)

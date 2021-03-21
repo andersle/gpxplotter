@@ -17,7 +17,7 @@ for track in read_gpx_file('example3.gpx'):
                            cmap='viridis', line_options=line_options)
 
 # To store the map as a HTML page:
-the_map.save('map_004.html')
+# the_map.save('map_004.html')
 
 # To display the map in a Jupyter notebook:
 the_map
