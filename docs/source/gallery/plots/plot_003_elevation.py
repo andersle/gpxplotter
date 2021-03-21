@@ -4,7 +4,8 @@
 Elevation profiles - filled plots
 =================================
 
-This example will plot the elevation as a
+This example will use the plotting methods of gpxplotter
+to plot the elevation as a
 function of distance and elapsed time.
 """
 from matplotlib import pyplot as plt

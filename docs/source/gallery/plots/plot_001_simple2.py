@@ -1,10 +1,11 @@
 # Copyright (c) 2021, Anders Lervik.
 # Distributed under the LGPLv2.1+ License. See LICENSE for more info.
 """
-Plotting with matplotlib
-========================
+Simple plot with matplotlib (2)
+===============================
 
-This example will combine some information using matplotlib
+This example will combine some information into a single
+plot with matplotlib.
 """
 from matplotlib import pyplot as plt
 from gpxplotter import read_gpx_file
@@ -13,6 +14,7 @@ plt.style.use('seaborn-talk')
 
 
 def smooth(signal, points):
+    """Smooth the given signal using a rectangular window."""
     window = np.ones(points) / points
     return np.convolve(signal, window, mode='same')
 
