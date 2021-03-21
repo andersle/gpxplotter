@@ -3,9 +3,11 @@ folium
 jinja2
 matplotlib
 numpy
+Pillow
 python-dateutil
 scipy
 sklearn
 sphinx
 sphinx_rtd_theme
 sphinx-gallery
+vincent

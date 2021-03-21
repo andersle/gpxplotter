@@ -17,6 +17,6 @@ for track in read_gpx_file('example1.gpx'):
         add_segment_to_map(the_map, segment, line_options=line_options)
 
 # To store the map as a HTML page:
-the_map.save('map_000.html')
+# the_map.save('map_000.html')
 # To display the map in a Jupyter notebook:
 the_map

@@ -17,7 +17,7 @@ for track in read_gpx_file('example2.gpx'):
                            cmap='RdPu_09', line_options=line_options)
 
 # To store the map as a HTML page:
-the_map.save('map_003.html')
+# the_map.save('map_003.html')
 
 # To display the map in a Jupyter notebook:
 the_map

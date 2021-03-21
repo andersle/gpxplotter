@@ -8,7 +8,6 @@ This example will create a map and color the track according
 to heart rate zones.
 """
 from gpxplotter import create_folium_map, read_gpx_file, add_segment_to_map
-import folium
 line_options = {'weight': 8}
 
 the_map = create_folium_map(tiles='stamenterrain')
@@ -18,7 +17,7 @@ for track in read_gpx_file('example3.gpx'):
                            cmap='viridis', line_options=line_options)
 
 # To store the map as a HTML page:
-the_map.save('map_004.html')
+# the_map.save('map_004.html')
 
 # To display the map in a Jupyter notebook:
 the_map

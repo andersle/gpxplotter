@@ -5,6 +5,9 @@ Inspecting velocities
 =====================
 
 This example will inspect the calculated velocities.
+
+.. note:: The velocities are calculated from the distance
+   so it is a bit noisy.
 """
 from matplotlib import pyplot as plt
 import matplotlib.dates as mdates
