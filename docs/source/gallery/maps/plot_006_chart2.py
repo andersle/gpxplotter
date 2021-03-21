@@ -34,6 +34,7 @@ def smooth(signal, points):
     window = np.ones(points) / points
     return np.convolve(signal, window, mode='same')
 
+
 data = pd.DataFrame(
     {
         'dist': segment['Distance / km'],
