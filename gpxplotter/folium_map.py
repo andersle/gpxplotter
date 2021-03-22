@@ -6,10 +6,10 @@ import branca.colormap
 from gpxplotter.common import RELABEL
 
 
-TILES = [
-    {
-        'name': 'topo4',
-        'url': (
+TILES = {
+    'kartverket_topo4': {
+        'name': 'Kartverket (topo4)',
+        'tiles': (
             'http://opencache.statkart.no/gatekeeper/gk/gk.open_gmaps?'
             'layers=topo4&zoom={z}&x={x}&y={y}'
         ),
@@ -17,21 +17,69 @@ TILES = [
             '<a href="http://www.kartverket.no/">Kartverket</a>',
         ),
     },
-    {
-        'name': 'topo4graatone',
-        'url': (
+    'kartverket_topo4graatone': {
+        'name': 'Kartverket (topo4graatone)',
+        'tiles': (
             'http://opencache.statkart.no/gatekeeper/gk/gk.open_gmaps?'
             'layers=topo4graatone&zoom={z}&x={x}&y={y}'
         ),
         'attr': (
             '<a href="http://www.kartverket.no/">Kartverket</a>',
         ),
-    }
-]
+    },
+    'opentopomap': {
+        'name': 'OpenTopoMap',
+        'tiles': 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
+        'attr': (
+            'Map data: &copy; '
+            '<a href="https://www.openstreetmap.org/copyright">OpenStreetMap'
+            '</a> contributors, <a href="http://viewfinderpanoramas.org">'
+            'SRTM</a> | Map style: &copy; <a href="https://opentopomap.org'
+            '">OpenTopoMap</a> (<a href="https://creativecommons.org/licen'
+            'ses/by-sa/3.0/">CC-BY-SA</a>)'
+        ),
+    },
+    'ersi.worldtopomap': {
+        'name': 'Esri.WorldTopoMap',
+        'tiles': (
+            'https://server.arcgisonline.com/ArcGIS/rest/services/'
+            'World_Topo_Map/MapServer/tile/{z}/{y}/{x}'
+        ),
+        'attr': (
+            'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, '
+            'TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase,'
+            ' Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri'
+            ' China (Hong Kong), and the GIS User Community'
+        ),
+    },
+    'esri_worldimagery': {
+        'name': 'Esri_WorldImagery',
+        'tiles': (
+            'https://server.arcgisonline.com/ArcGIS/rest/services/'
+            'World_Imagery/MapServer/tile/{z}/{y}/{x}'
+        ),
+        'attr': (
+            'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, '
+            'USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP'
+            ', and the GIS User Community'
+        ),
+    },
+}
+
+
+_FOLIUM_TILES = ('openstreetmap', 'stamenterrain')
 
 
 def create_folium_map(**kwargs):
     """Create a folium map.
+
+    This method is essentially the same as calling
+    ``folium.Map(**kwargs)``, with a few differences:
+
+    * ``control_scale = True`` by default.
+    * ``tiles`` can be ``openstreetmap`` or ``stamenterrain`` or
+      any of the tiles defined in :py:const:``.TILES``.
+    * A :py:class:``folium.LayerControl`` is added to the map.
 
     Parameters
     ----------
@@ -47,17 +95,39 @@ def create_folium_map(**kwargs):
     """
     # Add a few defaults:
     kwargs['control_scale'] = kwargs.get('control_scale', True)
-    kwargs['tiles'] = kwargs.get('tiles', None)
-    the_map = folium.Map(**kwargs)
-    # Add extra tiles:
-    for tile in TILES:
-        folium.TileLayer(
-            tile['url'], attr=tile['attr'], name=tile['name']
-        ).add_to(the_map)
-    folium.TileLayer('openstreetmap').add_to(the_map)
-    folium.TileLayer('stamenterrain').add_to(the_map)
-    folium.LayerControl().add_to(the_map)
+    tiles = kwargs.get('tiles', None)
+    if tiles is None:
+        the_map = folium.Map(**kwargs)
+    else:
+        if tiles in _FOLIUM_TILES:
+            the_map = folium.Map(**kwargs)
+        else:
+            if tiles in TILES:
+                tile_layer = folium.TileLayer(**TILES[tiles])
+                kwargs['tiles'] = None
+                the_map = folium.Map(**kwargs)
+                the_map.add_child(tile_layer, name=tile_layer.tile_name)
     return the_map
+
+
+def add_tiles_to_map(the_map, *tiles):
+    """Add pre-defined tiles to the given map.
+
+    Parameters
+    ----------
+    the_map : object like :py:class:`folium.folium.Map`
+        The map to add tiles to.
+    tiles : list of strings
+        The name of the tiles to add.
+
+    """
+    for tile in tiles:
+        if tile in _FOLIUM_TILES:
+            folium.TileLayer(tile).add_to(the_map)
+        else:
+            if tile in TILES:
+                tile_layer = folium.TileLayer(**TILES[tile])
+                the_map.add_child(tile_layer, name=tile_layer.tile_name)
 
 
 def add_start_top_markers(the_map, segment):
@@ -146,12 +216,11 @@ def add_colored_line(the_map, segment, color_by, cmap='viridis',
         The map to add the segment to.
     segment : dict
         The segment to add.
-    color_by : string, optional
+    color_by : string
         This string selects what property we will color the segment
-        according to. If this is None, the segment will be displayed
-        with a single color.
+        according to.
     cmap : string
-        The colormap to use if ``color_by != None``.
+        The colormap to use for coloring.
     line_options : dict
         Extra control options for drawing the line.
 

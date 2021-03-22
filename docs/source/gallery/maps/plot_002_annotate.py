@@ -13,7 +13,7 @@ import folium
 import numpy as np
 
 
-the_map = create_folium_map(tiles='openstreetmap')
+the_map = create_folium_map(tiles='kartverket_topo4')
 for track in read_gpx_file('example1.gpx'):
     for i, segment in enumerate(track['segments']):
         # Add track to the map:

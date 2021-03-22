@@ -32,5 +32,9 @@ SOFTWARE.
 import matplotlib
 from .version import VERSION as __version__
 from .gpxread import read_gpx_file
-from .folium_map import create_folium_map, add_segment_to_map
+from .folium_map import (
+    create_folium_map,
+    add_segment_to_map,
+    add_tiles_to_map,
+)
 from .mplplotting import plot_line, plot_filled
