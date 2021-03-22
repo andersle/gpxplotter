@@ -77,9 +77,8 @@ def create_folium_map(**kwargs):
     ``folium.Map(**kwargs)``, with a few differences:
 
     * ``control_scale = True`` by default.
-    * ``tiles`` can be ``openstreetmap`` or ``stamenterrain`` or
-      any of the tiles defined in :py:const:``.TILES``.
-    * A :py:class:``folium.LayerControl`` is added to the map.
+    * ``tiles`` can be ``"openstreetmap"`` or ``"stamenterrain"`` or
+      any of the tiles defined in :py:const:`.TILES`.
 
     Parameters
     ----------
