@@ -216,12 +216,11 @@ def add_colored_line(the_map, segment, color_by, cmap='viridis',
         The map to add the segment to.
     segment : dict
         The segment to add.
-    color_by : string, optional
+    color_by : string
         This string selects what property we will color the segment
-        according to. If this is None, the segment will be displayed
-        with a single color.
+        according to.
     cmap : string
-        The colormap to use if ``color_by != None``.
+        The colormap to use for coloring.
     line_options : dict
         Extra control options for drawing the line.
 
