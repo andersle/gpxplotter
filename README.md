@@ -1,9 +1,9 @@
 # gpxplotter
 
 [![Documentation Status](https://readthedocs.org/projects/gpxplotter/badge/?version=latest)](https://gpxplotter.readthedocs.io/en/latest/?badge=latest)
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/andersle/gpxplotter/master?filepath=examples%2Fjupyter%2Fexamples.ipynb)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/andersle/gpxplotter/master?filepath=examples%2Fjupyter%2F)
 
-*gpxplotter* is a Python package for reading 
+**gpxplotter** is a Python package for reading 
 [gpx](https://en.wikipedia.org/wiki/GPS_Exchange_Format)
 files and creating simple predefined plots using
 [matplotlib](http://matplotlib.org/) 
@@ -13,7 +13,7 @@ and maps using
 Please see
 [https://gpxplotter.readthedocs.io/en/latest/](https://gpxplotter.readthedocs.io/en/latest/)
 for the latest documentation and the 
-[Binder notebook](https://mybinder.org/v2/gh/andersle/gpxplotter/master?filepath=examples%2Fjupyter%2Fexamples.ipynb) for examples.
+[Binder notebooks](https://mybinder.org/v2/gh/andersle/gpxplotter/master?filepath=examples%2Fjupyter%2F) for examples.
 
 ## Installation
 
@@ -24,7 +24,7 @@ pip install gpxplotter
 ## Examples
 
 Interactive examples can be explored
-via [Binder](https://mybinder.org/v2/gh/andersle/gpxplotter/master?filepath=examples%2Fjupyter%2Fexamples.ipynb).
+via [Binder](https://mybinder.org/v2/gh/andersle/gpxplotter/master?filepath=examples%2Fjupyter%2F).
 
 
 #### Simple example for showing a track in a map, colored by heart rate
@@ -43,3 +43,8 @@ the_map
 ```
 
 [![map](examples/images/map001.png)](examples/html/map001.html)
+
+### Further examples
+
+Please see the [gallery in the documentation](https://gpxplotter.readthedocs.io/en/latest/auto_examples/index.html)
+for further examples. 
