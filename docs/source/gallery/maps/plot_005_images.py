@@ -18,7 +18,7 @@ from PIL.ExifTags import TAGS, GPSTAGS
 
 line_options = {'weight': 8}
 
-the_map = create_folium_map(tiles='openstreetmap')
+the_map = create_folium_map()
 for track in read_gpx_file('example3.gpx'):
     for i, segment in enumerate(track['segments']):
         add_segment_to_map(the_map, segment, color_by='hr-zone-float',
@@ -69,6 +69,10 @@ for key, val in info.items():
     marker.add_to(the_map)
 boundary = the_map.get_bounds()
 the_map.fit_bounds(boundary, padding=(3, 3))
+
+# To store the map as a HTML page:
+# the_map.save('map_005_v1.html')
+
 # Display updated map:
 the_map
 
@@ -98,7 +102,6 @@ for key, val in info.items():
 
 # Mark the gps-locations we interpolated using time:
 the_map = create_folium_map(
-    tiles='openstreetmap',
     zoom_start=18,
     location=info['image1.jpg']['latlon_time']
 )
@@ -108,10 +111,20 @@ add_segment_to_map(
 )
 colors = ['blue', 'red', 'green']
 for i, (key, val) in enumerate(info.items()):
+    show = i == 0  # Open the first one.
+    popup = folium.Popup(
+        f'<img alt="{key}" src="../../_static/{key}", width=200/>',
+        show=show
+    )
     marker = folium.Marker(
         location=val['latlon_time'],
-        popup=f'<img alt="{key}" src="../../_static/{key}", width=200/>',
+        popup=popup,
         icon=folium.Icon(icon='camera', color=colors[i]),
     )
     marker.add_to(the_map)
+
+# To store the map as a HTML page:
+# the_map.save('map_005_v2.html')
+
+# To display the map in a Jupyter notebook:
 the_map

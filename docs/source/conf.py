@@ -10,10 +10,9 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-# import os
-# import sys
-# sys.path.insert(0, os.path.abspath('.'))
+import os
 import sys
+sys.path.insert(0, os.path.abspath('./extensions'))
 from datetime import date
 import warnings
 import gpxplotter
@@ -55,6 +54,7 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.intersphinx',
     'sphinx_gallery.gen_gallery',
+    'thumbnail_updater',
 ]
 
 # Napoleon settings
@@ -104,4 +104,9 @@ sphinx_gallery_conf = {
     'gallery_dirs': ['auto_examples'],
     'download_all_examples': False,
     'within_subsection_order': FileNameSortKey,
+}
+
+# Settings for thumbnail-updater:
+thumbnail_updater_conf = {
+    'thumbnail_dir': 'gallery_thumbs'
 }

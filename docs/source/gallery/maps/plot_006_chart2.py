@@ -16,7 +16,7 @@ import altair
 
 line_options = {'weight': 8}
 
-the_map = create_folium_map(tiles='openstreetmap')
+the_map = create_folium_map(tiles='kartverket_topo4')
 for track in read_gpx_file('example3.gpx'):
     for i, segment in enumerate(track['segments']):
         add_segment_to_map(the_map, segment, color_by='hr-zone-float',
@@ -80,4 +80,9 @@ marker = folium.Marker(
     icon=folium.Icon(icon='star'),
 )
 marker.add_to(the_map)
+
+# To store the map as a HTML page:
+# the_map.save('map_006_chart2.html')
+
+# To display the map in a Jupyter notebook:
 the_map
