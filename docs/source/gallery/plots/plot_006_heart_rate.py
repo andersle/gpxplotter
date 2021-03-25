@@ -1,11 +1,12 @@
 # Copyright (c) 2021, Anders Lervik.
 # Distributed under the LGPLv2.1+ License. See LICENSE for more info.
 """
-Simple plot with matplotlib (2)
-===============================
+Pie chart of heart rate zones
+=============================
 
-This example will combine some information into a single
-plot with matplotlib.
+This example will use the calculated heart rate zones from
+gpxplotter to show the fraction of time spent in the different
+zones.
 """
 from matplotlib import pyplot as plt
 from matplotlib.cm import get_cmap
