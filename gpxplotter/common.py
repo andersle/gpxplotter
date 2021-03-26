@@ -21,35 +21,6 @@ RELABEL = {
 }
 
 
-def heart_rate_zones(pulse, max_heart_rate=187):
-    """Calculate heart rate zones.
-
-    Parameters
-    ----------
-    pulse : int (or float)
-        The heart rate to converte into a heart rate zone.
-    max_heart_rate : int (or float), optional
-        The maximal heart rate.
-
-    Returns
-    -------
-    out[0] : float
-        The heart rate zone.
-    out[1] : float
-        The heart rate zone, rounded to an integer.
-    out[2] : float
-        The fraction of the heart rate to the max heart rate.
-
-    """
-    frac = float(pulse) / float(max_heart_rate)
-    zone = 10.0 * frac - 4.0
-    if zone < 1.0:
-        zone = 1.0
-    if zone > 5.0:
-        zone = 5.0
-    return zone, int(zone), frac
-
-
 def heart_rate_zone_limits(max_heart_rate=187, limits=None):
     """Return the limits for the heart rate zones.
 
@@ -115,13 +86,26 @@ def update_hr_zones(segment, max_heart_rate=187):
 
     """
     if 'hr' in segment:
-        hrzone = []
-        for i in segment['hr']:
-            zonei = heart_rate_zones(i, max_heart_rate=max_heart_rate)
-            hrzone.append(zonei)
-        segment['hr-zone'] = np.array([i[1] for i in hrzone], dtype=np.int_)
-        segment['hr-zone-float'] = np.array([i[0] for i in hrzone])
-        segment['hr-zone-frac'] = np.array([i[2] for i in hrzone])
+        limits = heart_rate_zone_limits(max_heart_rate=max_heart_rate)
+        bins = [i[0] for i in limits]
+        # bins[i-1] <= x < bins[i]
+        segment['hr-zone'] = np.digitize(segment['hr'], bins, right=False)
+        # Add fractional part:
+        zone_float = []
+        for hrate, zone in zip(segment['hr'], segment['hr-zone']):
+            if zone == 0:
+                left = 0
+                right = bins[0]
+            elif zone == len(bins):
+                left = bins[-1]
+                right = max_heart_rate
+            else:
+                left = bins[zone-1]
+                right = bins[zone]
+            frac = (hrate - left) / (right - left)
+            zone_float.append(zone + frac)
+        segment['hr-zone-float'] = np.array(zone_float)
+        segment['hr-zone-frac'] = segment['hr'] / max_heart_rate
         segment['hr-regions'] = find_regions(segment['hr-zone'])
 
 
