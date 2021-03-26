@@ -7,6 +7,9 @@ Adding velocity
 This example will plot the elevation as a
 function of distance and color the plot
 according to the velocity.
+
+.. note:: The velocities are calculated from the distance
+   so it is a bit noisy.
 """
 from matplotlib import pyplot as plt
 from gpxplotter import read_gpx_file, plot_filled
