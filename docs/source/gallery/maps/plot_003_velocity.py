@@ -6,6 +6,9 @@ Track colored by velocity
 
 This example will create a map and color the track according
 to the velocity.
+
+.. note:: The velocities are calculated from the distance
+   so it is a bit noisy.
 """
 from gpxplotter import read_gpx_file, create_folium_map, add_segment_to_map
 line_options = {'weight': 8}
