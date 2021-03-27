@@ -27,20 +27,17 @@ from setuptools import setup, find_packages
 GITHUB = 'https://github.com/andersle/gpxplotter'
 DOCS = 'https://gpxplotter.readthedocs.io/en/latest'
 
-FULL_VERSION = '0.2.3'  # Automatically set by setup_version.py
+FULL_VERSION = '0.2.4'  # Automatically set by setup_version.py
 
 
 def get_long_description():
-    """Hard-coded long description."""
-    long_description = (
-        'gpxplotter is a small package for reading'
-        '.gpx files and creating simple plots using '
-        '`matplotlib <https://www.matplotlib.org/>`_ and simple maps '
-        'using `folium <https://python-visualization.github.io/folium/>`_. '
-        'The gpxplotter documentation can be found at `{docs} <{docs}>`_'
-        ' and the source code is hosted at `{github} <{github}>`_.'
-    )
-    return long_description.format(docs=DOCS, github=GITHUB)
+    """Return the contents of the README.md file."""
+    # Get the long description from the README file
+    long_description = ''
+    readme = HERE.joinpath('pypireadme.md')
+    with open(readme, 'r') as fileh:
+        long_description = fileh.read()
+    return long_description
 
 
 def get_version():
@@ -71,6 +68,7 @@ setup(
     version=get_version(),
     description='A package for reading gpx files and creating simple plots',
     long_description=get_long_description(),
+    long_description_content_type='text/markdown',
     url=GITHUB,
     author='Anders Lervik',
     author_email='andersle@gmail.com',

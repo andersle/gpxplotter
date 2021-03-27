@@ -23,9 +23,9 @@ def vincenty(point1, point2, tol=10**-12, maxitr=1000):
     Parameters
     ----------
     point1 : tuple of floats
-        This is the first coordinate on form: ``(lat, lon)``.
+        This is the first coordinate on the form: ``(lat, lon)``.
     point2 : tuple of floats
-        This is the second coordinate on form: ``(lat, lon)``.
+        This is the second coordinate on the form: ``(lat, lon)``.
     tol : float, optional
         The tolerance from convergence. The default value is
         taken from the wikipedia article.
@@ -34,7 +34,7 @@ def vincenty(point1, point2, tol=10**-12, maxitr=1000):
 
     References
     ----------
-    This calculation is based on the formula available from wikipedia [1]_.
+    This calculation is based on the formula available from Wikipedia [1]_.
 
     .. [1] https://en.wikipedia.org/wiki/Vincenty's_formulae
 
@@ -52,7 +52,7 @@ def vincenty(point1, point2, tol=10**-12, maxitr=1000):
 
     diff_long = radians(lon2) - radians(lon1)
 
-    # Iteratively, according to wikipedia
+    # Iteratively, according to Wikipedia
     lambd = diff_long
 
     sin1 = sin(rlat1)
@@ -162,7 +162,7 @@ def read_segment(segment):
     Parameters
     ----------
     segment : object like :py:class:`xml.dom.minidom.Element`
-        The sement we are about to read data from.
+        The segment we are about to read data from.
 
     Returns
     -------
@@ -234,13 +234,13 @@ def _get_gpx_text(track, tagname):
 def approximate_velocity(distance, time):
     """Calculate approximate velocities.
 
-    This method will calculate approxiate velocities by
+    This method will calculate approximate velocities by
     finding a spline and its derivative.
 
     Parameters
     ----------
     distance : array_like
-        Distances measured as a function of time.
+        Distances, measured as a function of time.
     time : array_like
         The accompanying time stamps for the velocities.
 
@@ -260,7 +260,7 @@ def process_segment(segment, max_heart_rate=187):
     segment : dict
         The raw data from the gpx file.
     max_heart_rate : float, optional
-        The maximum heart rate, used for calculation of
+        The maximum heart rate, used for the calculation of
         heart rate zones.
 
     """
@@ -320,7 +320,7 @@ def read_gpx_file(gpxfile, max_heart_rate=187):
     gpxfile : string
         The file to open and read.
     max_heart_rate : integer (or float)
-        The maximum pulse. Used in calculation of heat rate zones.
+        The heart rate, used in calculation of heart rate zones.
 
     Yields
     ------
