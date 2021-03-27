@@ -1,7 +1,7 @@
 # gpxplotter
 
 [![Documentation Status](https://readthedocs.org/projects/gpxplotter/badge/?version=latest)](https://gpxplotter.readthedocs.io/en/latest/?badge=latest)
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/andersle/gpxplotter/master?filepath=examples%2Fjupyter%2F)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/andersle/gpxplotter/main?filepath=examples%2Fjupyter%2F)
 
 **gpxplotter** is a Python package for reading 
 [gpx](https://en.wikipedia.org/wiki/GPS_Exchange_Format)
@@ -13,7 +13,7 @@ and maps using
 Please see
 [https://gpxplotter.readthedocs.io/en/latest/](https://gpxplotter.readthedocs.io/en/latest/)
 for the latest documentation and the 
-[Binder notebooks](https://mybinder.org/v2/gh/andersle/gpxplotter/master?filepath=examples%2Fjupyter%2F) for examples.
+[Binder notebooks](https://mybinder.org/v2/gh/andersle/gpxplotter/main?filepath=examples%2Fjupyter%2F) for examples.
 
 ## Installation
 
@@ -24,7 +24,7 @@ pip install gpxplotter
 ## Examples
 
 Interactive examples can be explored
-via [Binder](https://mybinder.org/v2/gh/andersle/gpxplotter/master?filepath=examples%2Fjupyter%2F).
+via [Binder](https://mybinder.org/v2/gh/andersle/gpxplotter/main?filepath=examples%2Fjupyter%2F).
 
 
 #### Simple example for showing a track in a map, colored by heart rate
