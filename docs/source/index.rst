@@ -7,7 +7,7 @@ generating plots using `matplotlib <https://www.matplotlib.org/>`_
 and maps using `folium <https://python-visualization.github.io/folium/>`_:
 
 .. literalinclude:: gallery/maps/plot_001_heart_rate.py
-   :lines: 10-
+   :lines: 3-
 
 .. raw:: html
 
