@@ -34,7 +34,8 @@ def get_long_description():
     """Return the contents of the README.md file."""
     # Get the long description from the README file
     long_description = ''
-    readme = HERE.joinpath('pypireadme.md')
+    here = pathlib.Path(__file__).absolute().parent
+    readme = here.joinpath('pypireadme.md')
     with open(readme, 'r') as fileh:
         long_description = fileh.read()
     return long_description
