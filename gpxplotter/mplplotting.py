@@ -34,7 +34,7 @@ ZONE_COLORS = {
 
 
 def _select_cmap(zdata, cmap_name):
-    """Selects if the color map should be discrete or not.
+    """Selects if the colormap should be discrete or not.
 
     Parameters
     ----------
@@ -231,7 +231,8 @@ def _get_data(data, key):
 def add_segmented_line(xdata, ydata, zdata, cmap_name='viridis'):
     """Create multicolored line.
 
-    Create a multicolored line colored after the zdata-values.
+    Create a multicolored line, colored according to the provided
+    ``zdata``-values.
 
     Parameters
     ----------
@@ -380,7 +381,7 @@ def _update_time_ticklabels(axi, xvar, yvar, xdata, ydata):
 def fix_elapsed_time(axi, var, data_axes, data_plot, which='x'):
     """For labels for time when elapsed time is used in plotting.
 
-    For colorling plots, the elapsed time data is used for making lines
+    For coloring plots, the elapsed time data is used for making lines
     or polygons. This method will shift the labels back to the original
     variable.
 

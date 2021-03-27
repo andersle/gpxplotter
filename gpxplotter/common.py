@@ -82,7 +82,7 @@ def update_hr_zones(segment, max_heart_rate=187):
     segment : dict
         The segment to add zones for.
     max_heart_rate : int (or float)
-        The maximum heart rate, used for calculation of zones.
+        The maximum heart rate, used for the calculation of zones.
 
     """
     if 'hr' in segment:

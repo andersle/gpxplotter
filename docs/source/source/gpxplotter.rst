@@ -4,7 +4,7 @@ The |gpxplotter| package
 ========================
 
 This is the documentation for the source code of
-the |gpxplotter| library.
+the |gpxplotter| library, version |version|.
 
 |gpxplotter| modules
 --------------------
