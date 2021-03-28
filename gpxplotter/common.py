@@ -34,6 +34,12 @@ def heart_rate_zone_limits(max_heart_rate=187, limits=None):
         form `[[min_zone_1, max_zone_1],]`. The default zones
         are:
         `[(0.5, 0.6), (0.6, 0.7), (0.7, 0.8), (0.8, 0.9), (0.9, 1.0)]`
+
+    Returns
+    -------
+    out : list of list of numbers
+        The heart rates defining the different zones.
+
     """
     if limits is None:
         limits = HR_LIMITS
@@ -41,7 +47,19 @@ def heart_rate_zone_limits(max_heart_rate=187, limits=None):
 
 
 def format_time_delta(time_delta):
-    """Format time deltas as strings on the form hh:mm:ss."""
+    """Format time deltas as strings on the form hh:mm:ss.
+
+    Parameters
+    ----------
+    time_delta : array_like
+        A time in seconds.
+
+    Returns
+    -------
+    timel : list of strings
+        The ``time_delta`` formatted as hh:mm:ss
+
+    """
     timel = []
     for i in time_delta:
         hours, res = divmod(i, 3600)
@@ -51,7 +69,22 @@ def format_time_delta(time_delta):
 
 
 def find_regions(yval):
-    """Find borders for regions with equal values."""
+    """Find borders for regions with equal values.
+
+    Parameters
+    ----------
+    yval : array_like
+        The values we are to locate regions for.
+
+    Returns
+    -------
+    new_regions : list of lists of numbers
+        The regions where yval is constant. These are on the form
+        ``[start_index, end_index, constant_y]`` with the
+        interpretation that ``yval=constant-y`` for the index
+        range ``[start_index, end_index]``
+
+    """
     regions = []
     region_y = None
     i = None
@@ -107,6 +140,31 @@ def update_hr_zones(segment, max_heart_rate=187):
         segment['hr-zone-float'] = np.array(zone_float)
         segment['hr-zone-frac'] = segment['hr'] / max_heart_rate
         segment['hr-regions'] = find_regions(segment['hr-zone'])
+        segment['zone_txt'] = get_limits_txt(limits)
+
+
+def get_limits_txt(limits):
+    """Return heart rate limits as text.
+
+    Parameters
+    ----------
+    limits : list of list of numbers
+
+    Returns
+    -------
+    txt : dict
+        Text representing the heart rate zones.
+
+    """
+    txt = {
+        0: f'$<${int(limits[0][0])} bpm',
+        1: f'{int(limits[0][0])}‒{int(limits[0][1])} bpm',
+        2: f'{int(limits[1][0])}‒{int(limits[1][1])} bpm',
+        3: f'{int(limits[2][0])}‒{int(limits[2][1])} bpm',
+        4: f'{int(limits[3][0])}‒{int(limits[3][1])} bpm',
+        5: f'$>${int(limits[3][1])} bpm',
+    }
+    return txt
 
 
 def cluster_velocities(velocities, n_clusters=5):
