@@ -42,7 +42,6 @@ for track in read_gpx_file('example3.gpx'):
             diff = abs(j - segment['Distance / km'])
             idx = np.argmin(diff)
             location_idx.append(idx)
-        # Add extra location at the end:
         for dist, j in zip(locations, location_idx):
             icon = BeautifyIcon(text_color='#262626', border_color='#006d2c',
                                 background_color='#ffffff', number=dist,

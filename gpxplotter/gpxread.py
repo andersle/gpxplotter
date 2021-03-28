@@ -19,6 +19,9 @@ EXTRACT = {
 
 def vincenty(point1, point2, tol=10**-12, maxitr=1000):
     """Calculate distance between two lat/lon coordinates.
+    
+    This calculation is based on the formula available from
+    Wikipedia [1]_.
 
     Parameters
     ----------
@@ -34,7 +37,6 @@ def vincenty(point1, point2, tol=10**-12, maxitr=1000):
 
     References
     ----------
-    This calculation is based on the formula available from Wikipedia [1]_.
 
     .. [1] https://en.wikipedia.org/wiki/Vincenty's_formulae
 

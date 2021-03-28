@@ -11,7 +11,7 @@ zones.
 from matplotlib import pyplot as plt
 from matplotlib.cm import get_cmap
 from gpxplotter import read_gpx_file
-from gpxplotter.common import format_time_delta, heart_rate_zone_limits
+from gpxplotter.common import format_time_delta
 import numpy as np
 plt.style.use('seaborn-talk')
 
@@ -32,15 +32,7 @@ for track in read_gpx_file('example4.gpx', max_heart_rate=MAX_HEART_RATE):
         # Check consistency:
         print('Times are equal?', sum_time == (time[-1] - time[0]).seconds)
 
-        limits = heart_rate_zone_limits(max_heart_rate=MAX_HEART_RATE)
-        zone_txt = {
-            0: f'$<${int(limits[0][0])} bpm',
-            1: f'{int(limits[0][0])}‒{int(limits[0][1])} bpm',
-            2: f'{int(limits[1][0])}‒{int(limits[1][1])} bpm',
-            3: f'{int(limits[2][0])}‒{int(limits[2][1])} bpm',
-            4: f'{int(limits[3][0])}‒{int(limits[3][1])} bpm',
-            5: f'$>${int(limits[3][1])} bpm',
-        }
+        zone_txt = segment['zone_txt']
 
         zones = sorted(list(time_in_zones.keys()))
         percent = {

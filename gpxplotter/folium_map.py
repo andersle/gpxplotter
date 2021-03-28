@@ -38,9 +38,11 @@ TILES = {
             '">OpenTopoMap</a> (<a href="https://creativecommons.org/licen'
             'ses/by-sa/3.0/">CC-BY-SA</a>)'
         ),
+        'min_zoom': 0,
+        'max_zoom': 18,
     },
     'ersi.worldtopomap': {
-        'name': 'Esri.WorldTopoMap',
+        'name': 'Esri (WorldTopoMap)',
         'tiles': (
             'https://server.arcgisonline.com/ArcGIS/rest/services/'
             'World_Topo_Map/MapServer/tile/{z}/{y}/{x}'
@@ -53,7 +55,7 @@ TILES = {
         ),
     },
     'esri_worldimagery': {
-        'name': 'Esri_WorldImagery',
+        'name': 'Esri (WorldImagery)',
         'tiles': (
             'https://server.arcgisonline.com/ArcGIS/rest/services/'
             'World_Imagery/MapServer/tile/{z}/{y}/{x}'
@@ -63,6 +65,33 @@ TILES = {
             'USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP'
             ', and the GIS User Community'
         ),
+    },
+    'openstreetmap_humanitarian': {
+        'name': 'Humanitarian',
+        'tiles': 'https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png',
+        'attr': (
+            '&copy; <a href="https://www.openstreetmap.org/copyright">'
+            'OpenStreetMap</a> contributors, Tiles style by <a href="'
+            'https://www.hotosm.org/" target="_blank">Humanitarian '
+            'OpenStreetMap Team</a> hosted by <a href='
+            '"https://openstreetmap.fr/" target="_blank">OpenStreetMap'
+            ' France</a>'
+        ),
+    },
+    'cyclosm': {
+        'name': 'CyclOSM',
+        'tiles': (
+            'https://{s}.tile-cyclosm.openstreetmap.fr'
+            '/cyclosm/{z}/{x}/{y}.png'
+        ),
+        'attr': (
+            '<a href="https://github.com/cyclosm/cyclosm-cartocss-style'
+            '/releases" title="CyclOSM - Open Bicycle render">CyclOSM</a>'
+            ' | Map data: &copy; <a href="https://www.openstreetmap.org/'
+            'copyright">OpenStreetMap</a> contributors'
+        ),
+        'min_zoom': 0,
+        'max_zoom': 20,
     },
 }
 
@@ -129,6 +158,47 @@ def add_tiles_to_map(the_map, *tiles):
                 the_map.add_child(tile_layer, name=tile_layer.tile_name)
 
 
+def add_all_tiles(the_map):
+    """Add all pre-defined tiles to the given map."""
+    tiles = list(_FOLIUM_TILES) + list(TILES.keys())
+    add_tiles_to_map(the_map, *tiles)
+
+
+def add_marker_at(the_map, segment, index, tooltip, **kwargs):
+    """Add start marker at the given index.
+
+    Parameters
+    ----------
+    the_map : object like :py:class:`folium.folium.Map`
+        The map to add the markers to.
+    segment : dict
+        The segment to add marker for.
+    index : int
+        The point in the segment to add marker to.
+    tooltip : string
+        The tooltip to be added to the marker.
+    kwargs : optional
+        Arguments passed on to :py:class:`folim.Icon`.
+
+    """
+    time = segment['time'][index].strftime('%A %B %d, %Y: %H:%M:%S')
+    if index == 0:
+        txt = f'<b>Start:</b> {time}'
+    elif index == -1:
+        dist = segment['distance'][index] / 1000.
+        txt = f'<b>End:</b> {time}</br><b>Distance:</b> {dist:.2f} km'
+    else:
+        dist = segment['distance'][index] / 1000.
+        txt = f'<b>Time:</b>{time}</br><b>Distance:</b> {dist:.2f} km'
+    marker = folium.Marker(
+        location=segment['latlon'][index],
+        tooltip=tooltip,
+        popup=folium.Popup(txt, max_width=250),
+        icon=folium.Icon(**kwargs),
+    )
+    marker.add_to(the_map)
+
+
 def add_start_top_markers(the_map, segment):
     """Add markers for the start and end of the segment.
 
@@ -140,22 +210,8 @@ def add_start_top_markers(the_map, segment):
         The segment to use for finding the start and end points.
 
     """
-    start_time = segment['time'][0].strftime('%A %B %d, %Y: %H:%M:%S')
-    start = folium.Marker(
-        location=segment['latlon'][0],
-        tooltip='Start',
-        popup=folium.Popup(start_time, max_width=250),
-        icon=folium.Icon(icon='ok', color='green'),
-    )
-    start.add_to(the_map)
-    end_time = segment['time'][-1].strftime('%A %B %d, %Y: %H:%M:%S')
-    stop = folium.Marker(
-        location=segment['latlon'][-1],
-        tooltip='End',
-        popup=folium.Popup(end_time, max_width=250),
-        icon=folium.Icon(icon='home', color='lightgray'),
-    )
-    stop.add_to(the_map)
+    add_marker_at(the_map, segment, 0, 'Start', icon='ok', color='green')
+    add_marker_at(the_map, segment, -1, 'End', icon='home', color='lightgray')
 
 
 def add_segment_to_map(the_map, segment, color_by=None, cmap='viridis',
