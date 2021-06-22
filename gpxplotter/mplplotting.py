@@ -3,6 +3,7 @@
 """This module defines methods for plotting GPX data using matplotlib."""
 from math import floor, ceil
 import datetime
+import warnings
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.collections import PolyCollection, LineCollection
@@ -34,7 +35,7 @@ ZONE_COLORS = {
 
 
 def _select_cmap(zdata, cmap_name):
-    """Selects if the colormap should be discrete or not.
+    """Select a colormap and determine the number of colors.
 
     Parameters
     ----------
@@ -118,7 +119,7 @@ def make_patches(xdata, ydata, zdata, cmap_name='viridis'):
 
 
 def _make_time_labels(delta_seconds, nlab=5):
-    """Make n time-formatted labels for data in seconds"""
+    """Make n time-formatted labels for data in seconds."""
     label_pos = np.linspace(min(delta_seconds), max(delta_seconds),
                             nlab, dtype=np.int_)
     label_lab = format_time_delta(label_pos)
@@ -126,7 +127,7 @@ def _make_time_labels(delta_seconds, nlab=5):
 
 
 def set_up_figure(track):
-    """Helper method to create a figure.
+    """Help with creating a figure.
 
     This method will just create the figure and axis and
     set the title.
@@ -226,6 +227,17 @@ def _get_data(data, key):
         )
         raise Exception(msg) from error
     return kdata
+
+
+def _keys_are_present(data, *keys):
+    all_good = True
+    for key in keys:
+        if key is None:
+            continue
+        if key not in data:
+            warnings.warn(f'"{key}" not found in the segment. Ending plot.')
+            all_good = False
+    return all_good
 
 
 def add_segmented_line(xdata, ydata, zdata, cmap_name='viridis'):
@@ -426,7 +438,7 @@ def plot_line(track, data, xvar='distance', yvar='elevation', zvar=None,
         Selects the variable to use for coloring the line.
     cmap : string, optional
         Color map to use for the coloring
-    **kwargs : matplotlib.lines.Line2D properties, optional
+    **kwargs : :py:class:`matplotlib.lines.Line2D` properties, optional
         Extra properties for the plotting passed to the ``axi.plot``
         method.
 
@@ -438,6 +450,8 @@ def plot_line(track, data, xvar='distance', yvar='elevation', zvar=None,
         The axes to add ticks for.
 
     """
+    if not _keys_are_present(data, xvar, yvar, zvar):
+        return None, None
     fig, ax1 = set_up_figure(track)
     xdata = _get_data(data, xvar)
     ydata = _get_data(data, yvar)
@@ -488,7 +502,7 @@ def plot_filled(track, data, xvar='distance', yvar='elevation', zvar='hr',
     cut : integer, optional
         If given and if we are plotting hr-regions, this will divide
         the coloring into two different groups (see `.add_regions`).
-    **kwargs : matplotlib.lines.Line2D properties, optional
+    **kwargs : :py:class:`matplotlib.lines.Line2D` properties, optional
         Extra properties for the plotting passed to the ``axi.plot``
         method.
 
@@ -500,6 +514,8 @@ def plot_filled(track, data, xvar='distance', yvar='elevation', zvar='hr',
         The axes to add ticks for.
 
     """
+    if not _keys_are_present(data, xvar, yvar, zvar):
+        return None, None
     fig, ax1 = set_up_figure(track)
     xdata = _get_data(data, xvar)
     ydata = _get_data(data, yvar)
