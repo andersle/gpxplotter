@@ -32,7 +32,7 @@ the_map
 def get_lat_lon(imagefile):
     image = PIL.Image.open(imagefile)
     exif_info = {}
-    for key, val in image.getexif().items():
+    for key, val in image._getexif().items():
         exif_info[TAGS.get(key, key)] = val
     gps_info = {}
     for key, val in exif_info['GPSInfo'].items():
