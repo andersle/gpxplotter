@@ -438,7 +438,7 @@ def plot_line(track, data, xvar='distance', yvar='elevation', zvar=None,
         Selects the variable to use for coloring the line.
     cmap : string, optional
         Color map to use for the coloring
-    **kwargs : matplotlib.lines.Line2D properties, optional
+    **kwargs : :py:class:`matplotlib.lines.Line2D` properties, optional
         Extra properties for the plotting passed to the ``axi.plot``
         method.
 
@@ -502,7 +502,7 @@ def plot_filled(track, data, xvar='distance', yvar='elevation', zvar='hr',
     cut : integer, optional
         If given and if we are plotting hr-regions, this will divide
         the coloring into two different groups (see `.add_regions`).
-    **kwargs : matplotlib.lines.Line2D properties, optional
+    **kwargs : :py:class:`matplotlib.lines.Line2D` properties, optional
         Extra properties for the plotting passed to the ``axi.plot``
         method.
 
