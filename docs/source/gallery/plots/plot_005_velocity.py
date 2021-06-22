@@ -39,9 +39,11 @@ for track in read_gpx_file('example1.gpx'):
                     zvar='velocity-level')
         # The number of levels can be changed by updating the
         # velocity-level:
-        segment['velocity-level'] = cluster_velocities(
+        levels = cluster_velocities(
             segment['velocity'], n_clusters=6
         )
+        if levels is not None:
+            segment['velocity-level'] = levels
         plot_filled(track, segment, xvar='Distance / km', yvar='elevation',
                     zvar='velocity-level', cmap='viridis', color='k')
 plt.show()

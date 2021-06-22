@@ -1,6 +1,7 @@
 # Copyright (c) 2021, Anders Lervik.
 # Distributed under the LGPLv2.1+ License. See LICENSE for more info.
 """This module defines common methods for gpxplotter."""
+import warnings
 import numpy as np
 from sklearn.cluster import KMeans
 
@@ -185,6 +186,9 @@ def cluster_velocities(velocities, n_clusters=5):
         The velocity level (cluster) each velocity is assigned to.
 
     """
+    if np.isnan(velocities).any():
+        warnings.warn('Some velocities are NaN, skipping clustering')
+        return None
     vel = np.array(velocities).reshape(-1, 1)
     clu = KMeans(n_clusters=n_clusters, init='k-means++')
     labels = clu.fit_predict(vel)

@@ -1,6 +1,7 @@
 # Copyright (c) 2021, Anders Lervik.
 # Distributed under the LGPLv2.1+ License. See LICENSE for more info.
 """This module defines methods for reading data from GPX files."""
+import warnings
 from xml.dom import minidom
 from math import atan, atan2, radians, tan, sin, cos, sqrt
 import dateutil.parser
@@ -19,7 +20,7 @@ EXTRACT = {
 
 def vincenty(point1, point2, tol=10**-12, maxitr=1000):
     """Calculate distance between two lat/lon coordinates.
-    
+
     This calculation is based on the formula available from
     Wikipedia [1]_.
 
@@ -37,7 +38,6 @@ def vincenty(point1, point2, tol=10**-12, maxitr=1000):
 
     References
     ----------
-
     .. [1] https://en.wikipedia.org/wiki/Vincenty's_formulae
 
     """
@@ -140,7 +140,6 @@ def get_point_data(point):
         The point on the track we are extracting information from.
 
     """
-
     data = {
         'lat': float(point.getAttribute('lat')),
         'lon': float(point.getAttribute('lon')),
@@ -247,11 +246,42 @@ def approximate_velocity(distance, time):
         The accompanying time stamps for the velocities.
 
     """
-    spline = UnivariateSpline(time, distance, k=3)
-    vel = spline.derivative()(time)
-    idx = np.where(vel < 0)[0]
-    vel[idx] = 0.0
-    return vel
+    try:
+        spline = UnivariateSpline(time, distance, k=3)
+        vel = spline.derivative()(time)
+        idx = np.where(vel < 0)[0]
+        vel[idx] = 0.0
+        return vel
+    except Exception as error:
+        warnings.warn(f'Estimating velocities failed: "{error.args}"')
+        return None
+
+
+def get_velocity(segment):
+    """Attempt to estimate the velocity.
+
+    Parameters
+    ----------
+    segment : dict
+        The raw data from the gpx file.
+
+    """
+    # Velocity i m / s
+    velocity = approximate_velocity(
+        segment['distance'],
+        segment['elapsed-time']
+    )
+    if velocity is not None:
+        segment['velocity'] = velocity
+        segment['Velocity / km/h'] = 3.6 * segment['velocity']
+        # Pace in min / km, as float
+        idx = np.where(segment['velocity'] > 0)[0]
+        segment['pace'] = np.zeros_like(segment['velocity'])
+        segment['pace'][idx] = 1.0 / ((60. / 1000) * segment['velocity'][idx])
+        # Add velocity levels:
+        levels = cluster_velocities(segment['velocity'])
+        if levels is not None:
+            segment['velocity-level'] = levels
 
 
 def process_segment(segment, max_heart_rate=187):
@@ -282,18 +312,7 @@ def process_segment(segment, max_heart_rate=187):
     segment['Distance / km'] = segment['distance'] / 1000.
     # Estimate velocity:
     if 'distance' in segment and 'elapsed-time' in segment:
-        # Velocity i m / s
-        segment['velocity'] = approximate_velocity(
-                segment['distance'],
-                segment['elapsed-time']
-        )
-        segment['Velocity / km/h'] = 3.6 * segment['velocity']
-        # Pace in min / km, as float
-        idx = np.where(segment['velocity'] > 0)[0]
-        segment['pace'] = np.zeros_like(segment['velocity'])
-        segment['pace'][idx] = 1.0 / ((60. / 1000) * segment['velocity'][idx])
-        # Add velocity levels:
-        segment['velocity-level'] = cluster_velocities(segment['velocity'])
+        get_velocity(segment)
     # Add hr metrics:
     if 'hr' in segment:
         update_hr_zones(segment, max_heart_rate=max_heart_rate)
