@@ -147,7 +147,22 @@ def set_up_figure(track):
 
     """
     fig, ax1 = plt.subplots(constrained_layout=True)
-    ax1.set_title(f'{track["name"][0]}: {track["type"][0]}')
+    track_name, track_type = None, None
+    try:
+        track_name = track['name'][0]
+    except (IndexError, KeyError):
+        track_name = None
+
+    try:
+        track_type = track['type'][0]
+    except (IndexError, KeyError):
+        track_type = None
+
+    if track_name is not None:
+        if track_type is None:
+            ax1.set_title(f'{track_name}')
+        else:
+            ax1.set_title(f'{track_name}: {track_type}')
     return fig, ax1
 
 
