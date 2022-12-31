@@ -13,11 +13,19 @@ according to the velocity.
 """
 from matplotlib import pyplot as plt
 from gpxplotter import read_gpx_file, plot_filled
-plt.style.use('seaborn-talk')
+import seaborn as sns
 
-for track in read_gpx_file('example1.gpx'):
-    for i, segment in enumerate(track['segments']):
+sns.set_context("notebook")
+
+for track in read_gpx_file("example1.gpx"):
+    for i, segment in enumerate(track["segments"]):
         # Plot elevation as function of distance:
-        plot_filled(track, segment, xvar='Distance / km', yvar='elevation',
-                    zvar='Velocity / km/h')
+        fig, _ = plot_filled(
+            track,
+            segment,
+            xvar="Distance / km",
+            yvar="elevation",
+            zvar="Velocity / km/h",
+        )
+        sns.despine(fig=fig)
 plt.show()

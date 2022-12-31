@@ -10,17 +10,31 @@ function of distance and elapsed time.
 """
 from matplotlib import pyplot as plt
 from gpxplotter import read_gpx_file, plot_line
-plt.style.use('seaborn-talk')
+import seaborn as sns
 
-for track in read_gpx_file('example1.gpx'):
-    for i, segment in enumerate(track['segments']):
+sns.set_context("notebook")
+
+for track in read_gpx_file("example1.gpx"):
+    for i, segment in enumerate(track["segments"]):
         # Plot elevation as function of distance:
-        plot_line(track, segment, xvar='Distance / km', yvar='elevation')
+        plot_line(track, segment, xvar="Distance / km", yvar="elevation")
         # Plot elevation as function of elapsed time:
-        plot_line(track, segment, xvar='elapsed-time', yvar='elevation')
+        plot_line(track, segment, xvar="elapsed-time", yvar="elevation")
         # Repeat plots, but color by heart rate:
-        plot_line(track, segment, xvar='Distance / km', yvar='elevation',
-                  zvar='hr', lw=10)
-        plot_line(track, segment, xvar='elapsed-time', yvar='elevation',
-                  zvar='hr', lw=10)
+        plot_line(
+            track,
+            segment,
+            xvar="Distance / km",
+            yvar="elevation",
+            zvar="hr",
+            lw=10,
+        )
+        plot_line(
+            track,
+            segment,
+            xvar="elapsed-time",
+            yvar="elevation",
+            zvar="hr",
+            lw=10,
+        )
 plt.show()
