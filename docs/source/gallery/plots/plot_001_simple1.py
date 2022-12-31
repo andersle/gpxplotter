@@ -10,12 +10,15 @@ of time.
 from matplotlib import pyplot as plt
 import matplotlib.dates as mdates
 from gpxplotter import read_gpx_file
-plt.style.use('seaborn-talk')
+import seaborn as sns
 
-for track in read_gpx_file('example1.gpx'):
-    for i, segment in enumerate(track['segments']):
+sns.set_context("notebook")
+
+for track in read_gpx_file("example1.gpx"):
+    for i, segment in enumerate(track["segments"]):
         fig, ax1 = plt.subplots(constrained_layout=True)
-        ax1.plot(segment['time'], segment['distance'] / 1000., lw=5)
-        ax1.set(xlabel='Time', ylabel='Distance / km')
+        ax1.plot(segment["time"], segment["distance"] / 1000.0, lw=5)
+        ax1.set(xlabel="Time", ylabel="Distance / km")
         ax1.xaxis.set_major_formatter(mdates.DateFormatter("%H:%M:%S"))
+        sns.despine(fig=fig)
 plt.show()
