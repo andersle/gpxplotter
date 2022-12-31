@@ -27,7 +27,7 @@ from setuptools import setup, find_packages
 GITHUB = 'https://github.com/andersle/gpxplotter'
 DOCS = 'https://gpxplotter.readthedocs.io/en/latest'
 
-FULL_VERSION = '0.2.9'  # Automatically set by setup_version.py
+FULL_VERSION = '0.2.10'  # Automatically set by setup_version.py
 
 
 def get_long_description():
@@ -86,6 +86,7 @@ setup(
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
         'Topic :: Other/Nonlisted Topic',
     ],
     keywords='gpx gps',
