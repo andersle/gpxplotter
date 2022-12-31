@@ -7,6 +7,7 @@ numpy
 pandas
 Pillow
 python-dateutil
+seaborn
 scipy
 sklearn
 sphinx
