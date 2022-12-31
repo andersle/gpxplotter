@@ -24,7 +24,7 @@ for track in read_gpx_file('example3.gpx'):
         add_segment_to_map(the_map, segment, line_options=line_options)
 
 steepness = folium.WmsTileLayer(
-    url='https://gis3.nve.no/map/services/Bratthet/MapServer/WmsServer',
+    url='https://nve.geodataonline.no/arcgis/services/Bratthet/MapServer/WmsServer?',
     layers='Bratthet_snoskred',
     fmt='image/png',
     opacity=0.7,
