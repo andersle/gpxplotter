@@ -9,7 +9,7 @@ Pillow
 python-dateutil
 seaborn
 scipy
-sklearn
+scikit-learn
 sphinx
 sphinx_rtd_theme
 sphinx-gallery
