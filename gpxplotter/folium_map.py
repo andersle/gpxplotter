@@ -215,7 +215,8 @@ def add_start_top_markers(the_map, segment):
 
 
 def add_segment_to_map(the_map, segment, color_by=None, cmap='viridis',
-                       line_options=None, fit_bounds=True, add_start_end=True):
+                       line_options=None, fit_bounds=True, add_start_end=True,
+                       min_value=None, max_value=None):
     """Add a segment as a line to a map.
 
     This method will add a segment as a line to the given map. The line
@@ -242,6 +243,10 @@ def add_segment_to_map(the_map, segment, color_by=None, cmap='viridis',
     add_start_end : boolean, optional
         If True, this method will add markers at the start/end of the
         segment.
+    min_value : the minimum value for the colormap.
+        If None it will be determined from the segment data.
+    max_value : the maximum value for the colormap.
+        If None it will be determined from the segment data.
 
     """
     if color_by is None:
@@ -251,7 +256,8 @@ def add_segment_to_map(the_map, segment, color_by=None, cmap='viridis',
         line.add_to(the_map)
     else:
         add_colored_line(the_map, segment, color_by, cmap=cmap,
-                         line_options=line_options)
+                         line_options=line_options, min_value=min_value,
+                         max_value=max_value)
     if add_start_end:
         add_start_top_markers(the_map, segment)
     if fit_bounds:
@@ -260,7 +266,7 @@ def add_segment_to_map(the_map, segment, color_by=None, cmap='viridis',
 
 
 def add_colored_line(the_map, segment, color_by, cmap='viridis',
-                     line_options=None):
+                     line_options=None, min_value=None, max_value=None):
     """Add segment as a colored line to a map.
 
     Add a line colored by some value to the given map.
@@ -278,11 +284,16 @@ def add_colored_line(the_map, segment, color_by, cmap='viridis',
         The colormap to use for coloring.
     line_options : dict
         Extra control options for drawing the line.
+    min_value : the minimum value for the colormap.
+        If None it will be determined from the segment data.
+    max_value : the maximum value for the colormap.
+        If None it will be determined from the segment data.
 
     """
     zdata = segment[color_by]
     avg = 0.5 * (zdata[1:] + zdata[:-1])
-    minz, maxz = min(avg), max(avg)
+    minz = min_value if min_value else min(avg)
+    maxz = max_value if max_value else max(avg)
     uniq = len(set(zdata))
     if uniq < 10:
         levels = uniq + 1
