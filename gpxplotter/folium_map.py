@@ -299,9 +299,17 @@ def add_colored_line(the_map, segment, color_by, cmap='viridis',
         levels = uniq + 1
     else:
         levels = 10
-    linmap = getattr(branca.colormap.linear, cmap)
+    linmap = None
+    if isinstance(cmap, str):
+        linmap = getattr(branca.colormap.linear, cmap)
+    elif isinstance(cmap, branca.colormap.ColorMap):
+        linmap = cmap
+    else:
+        raise Exception("Color map can be either a name of a linear map from branca.coloramp package, or a branca.colormap.ColorMap instance.")
+
     colormap = linmap.scale(minz, maxz).to_step(levels)
     colormap.caption = RELABEL.get(color_by, color_by)
+
     if line_options is None:
         line_options = {'weight': 6}
     line_options['weight'] = line_options.get('weight', 6)
