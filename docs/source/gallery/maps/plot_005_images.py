@@ -31,27 +31,30 @@ the_map
 # Create a method to get coordinates from an image:
 def get_lat_lon(imagefile):
     image = PIL.Image.open(imagefile)
-    exif_info = {}
-    for key, val in image._getexif().items():
-        exif_info[TAGS.get(key, key)] = val
+    exif = image.getexif()
+    exif_info = {TAGS.get(key, key): val for key, val in exif.items()}
+    # Get the GPSInfo:
+    for key, value in TAGS.items():
+        if value == "GPSInfo":
+            exif_info[value] = exif.get_ifd(key)
+            break
     gps_info = {}
-    for key, val in exif_info['GPSInfo'].items():
+    for key, val in exif_info["GPSInfo"].items():
         gps_info[GPSTAGS.get(key, key)] = val
     # Convert to decimal latitude/longitude:
-    deg, minutes, seconds = gps_info['GPSLatitude']
-    latitude = deg + minutes/60. + seconds/3600.
-    if 'GPSLatitudeRef' == 'S':
+    deg, minutes, seconds = gps_info["GPSLatitude"]
+    latitude = deg + minutes / 60.0 + seconds / 3600.0
+    if "GPSLatitudeRef" == "S":
         latitude *= -1
-    deg, minutes, seconds = gps_info['GPSLongitude']
-    longitude = deg + minutes/60. + seconds/3600.
-    if 'GPSLongitudeRef' == 'W':
+    deg, minutes, seconds = gps_info["GPSLongitude"]
+    longitude = deg + minutes / 60.0 + seconds / 3600.0
+    if "GPSLongitudeRef" == "W":
         longitude *= -1
     # Turn time into datetime:
     time = datetime.datetime.strptime(
-        exif_info['DateTime'], '%Y:%m:%d %H:%M:%S'
+        exif_info["DateTime"], "%Y:%m:%d %H:%M:%S"
     )
     return latitude, longitude, time
-
 
 info = {}
 for filename in ('image1.jpg', 'image2.jpg', 'image3.jpg'):
