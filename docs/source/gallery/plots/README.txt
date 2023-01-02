@@ -1,4 +1,4 @@
 .. _examples-plots:
 
-Creating simple plots
----------------------
+Creating simple plots (matplotlib)
+----------------------------------

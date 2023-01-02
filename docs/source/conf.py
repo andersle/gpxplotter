@@ -100,8 +100,8 @@ intersphinx_mapping = {
 
 # Settings for gallery:
 sphinx_gallery_conf = {
-    'examples_dirs': ['gallery'],
-    'gallery_dirs': ['auto_examples'],
+    'examples_dirs': ['gallery/maps', 'gallery/plots'],
+    'gallery_dirs': ['auto_examples_maps', 'auto_examples_plots'],
     'download_all_examples': False,
     'within_subsection_order': FileNameSortKey,
 }

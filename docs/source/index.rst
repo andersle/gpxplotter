@@ -14,17 +14,9 @@ and maps using `folium <https://python-visualization.github.io/folium/>`_:
    <iframe src="_static/map_001.html" height="500px" width="100%"></iframe>
 
 
-Using `folium <https://python-visualization.github.io/folium/>`_, the maps can
-be annotated:
-
-.. literalinclude:: gallery/maps/plot_002_annotate.py
-   :lines: 3-
-
-
-.. raw:: html
-
-   <iframe src="_static/map_002.html" height="500px" width="100%"></iframe>
- 
+With `folium <https://python-visualization.github.io/folium/>`_ it
+is easy to customize your map, for instance, by adding markers. Please
+have a lok at the :ref:`examples <examples-maps>`.
 
 
 Installing |gpxplotter|
@@ -47,7 +39,8 @@ The source code for |gpxplotter| can be found in the
    :maxdepth: 2
    :caption: Documentation:
 
-   auto_examples/index
+   auto_examples_maps/index
+   auto_examples_plots/index
    source/gpxplotter
 
 Indices and tables
