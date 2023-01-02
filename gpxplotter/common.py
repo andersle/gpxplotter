@@ -190,7 +190,7 @@ def cluster_velocities(velocities, n_clusters=5):
         warnings.warn('Some velocities are NaN, skipping clustering')
         return None
     vel = np.array(velocities).reshape(-1, 1)
-    clu = KMeans(n_clusters=n_clusters, init='k-means++')
+    clu = KMeans(n_clusters=n_clusters, init='k-means++', n_init=10)
     labels = clu.fit_predict(vel)
     # Sort labels according to cluster centers so that a lower label
     # is a lower velocity:
