@@ -116,7 +116,7 @@ colors = ['blue', 'red', 'green']
 for i, (key, val) in enumerate(info.items()):
     show = i == 0  # Open the first one.
     popup = folium.Popup(
-        f'<img alt="{key}" src="../../_static/{key}", width=200/>',
+        f'<img alt="{key}" src="../_static/{key}", width=200/>',
         show=show
     )
     marker = folium.Marker(

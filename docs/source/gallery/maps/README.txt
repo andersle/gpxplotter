@@ -3,4 +3,5 @@
 Creating maps
 -------------
 
-(The generated maps can be viewed by opening the examples.)
+Here are some examples that add tracks/segments and also
+additional information (markers, colors, images, etc.) to maps.
