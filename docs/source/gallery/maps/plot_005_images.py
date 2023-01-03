@@ -58,7 +58,6 @@ def get_lat_lon(imagefile):
 
 info = {}
 for filename in ('image1.jpg', 'image2.jpg', 'image3.jpg'):
-    #lat, lon, time = get_lat_lon(f'../../_static/{filename}')
     lat, lon, time = get_lat_lon(f'../../_static/{filename}')
     info[filename] = {'latlon': (lat, lon), 'time': time}
 
