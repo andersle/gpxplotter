@@ -46,5 +46,5 @@ the_map
 
 ### Further examples
 
-Please see the [gallery in the documentation](https://gpxplotter.readthedocs.io/en/latest/auto_examples/index.html)
+Please see the [gallery in the documentation](https://gpxplotter.readthedocs.io/en/latest/auto_examples_maps/index.html)
 for further examples. 
