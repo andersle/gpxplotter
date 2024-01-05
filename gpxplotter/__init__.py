@@ -29,12 +29,22 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 """
-from .version import VERSION as __version__
-from .gpxread import read_gpx_file
 from .folium_map import (
-    create_folium_map,
+    add_all_tiles,
     add_segment_to_map,
     add_tiles_to_map,
-    add_all_tiles,
+    create_folium_map,
 )
-from .mplplotting import plot_line, plot_filled
+from .gpxread import read_gpx_file
+from .mplplotting import plot_filled, plot_line
+from .version import VERSION as __version__
+
+__all__ = [
+    "read_gpx_file",
+    "create_folium_map",
+    "add_segment_to_map",
+    "add_tiles_to_map",
+    "add_all_tiles",
+    "plot_line",
+    "plot_filled",
+]
