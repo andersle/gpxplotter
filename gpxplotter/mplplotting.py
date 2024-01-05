@@ -1,36 +1,37 @@
 # Copyright (c) 2021, Anders Lervik.
 # Distributed under the LGPLv2.1+ License. See LICENSE for more info.
 """This module defines methods for plotting GPX data using matplotlib."""
-from math import floor, ceil
 import datetime
 import warnings
-import numpy as np
-from matplotlib import pyplot as plt
-from matplotlib.collections import PolyCollection, LineCollection
-from matplotlib.colors import Normalize, BoundaryNorm
-from matplotlib.cm import get_cmap
+from math import ceil, floor
+
 import matplotlib.dates as mdates
 import matplotlib.patches as mpatches
-from gpxplotter.common import format_time_delta, RELABEL
+import numpy as np
+from matplotlib import pyplot as plt
+from matplotlib.cm import get_cmap
+from matplotlib.collections import LineCollection, PolyCollection
+from matplotlib.colors import BoundaryNorm, Normalize
 
+from gpxplotter.common import RELABEL, format_time_delta
 
 ZONE_COLORS_0 = {
-    1: '#ffffcc',
-    2: '#a1dab4',
-    3: '#41b6c4',
-    4: '#2c7fb8',
-    5: '#253494'
+    1: "#ffffcc",
+    2: "#a1dab4",
+    3: "#41b6c4",
+    4: "#2c7fb8",
+    5: "#253494",
 }
 ZONE_COLORS_1 = {
-    1: '#e41a1c',
-    2: '#377eb8',
-    3: '#4daf4a',
-    4: '#984ea3',
-    5: '#ff7f00',
+    1: "#e41a1c",
+    2: "#377eb8",
+    3: "#4daf4a",
+    4: "#984ea3",
+    5: "#ff7f00",
 }
 ZONE_COLORS = {
-    0: '#bcbddc',
-    1: '#9e9ac8',
+    0: "#bcbddc",
+    1: "#9e9ac8",
 }
 
 
@@ -64,7 +65,7 @@ def _select_cmap(zdata, cmap_name):
     return cmap, norm
 
 
-def make_patches(xdata, ydata, zdata, cmap_name='viridis'):
+def make_patches(xdata, ydata, zdata, cmap_name="viridis"):
     """Make some patches for multi-coloring the area under a curve.
 
     Parameters
@@ -95,24 +96,25 @@ def make_patches(xdata, ydata, zdata, cmap_name='viridis'):
         if i == 0:
             xnext = 0.5 * (xdata[i + 1] + xval)
             ynext = 0.5 * (ydata[i + 1] + yval)
-            verts.append([
-                [xval, 0], [xval, yval], [xnext, ynext], [xnext, 0]
-            ])
+            verts.append([[xval, 0], [xval, yval], [xnext, ynext], [xnext, 0]])
         elif i == len(xdata) - 1:
             xprev = 0.5 * (xval + xdata[i - 1])
             yprev = 0.5 * (yval + ydata[i - 1])
-            verts.append([
-                [xprev, 0], [xprev, yprev], [xval, yval], [xval, 0]
-            ])
+            verts.append([[xprev, 0], [xprev, yprev], [xval, yval], [xval, 0]])
         else:
             xnext = 0.5 * (xdata[i + 1] + xval)
             ynext = 0.5 * (ydata[i + 1] + yval)
             xprev = 0.5 * (xval + xdata[i - 1])
             yprev = 0.5 * (yval + ydata[i - 1])
-            verts.append([
-                [xprev, 0], [xprev, yprev], [xval, yval],
-                [xnext, ynext], [xnext, 0]
-            ])
+            verts.append(
+                [
+                    [xprev, 0],
+                    [xprev, yprev],
+                    [xval, yval],
+                    [xnext, ynext],
+                    [xnext, 0],
+                ]
+            )
     poly = PolyCollection(verts, cmap=cmap, norm=norm)
     poly.set_array(zdata)
     return poly, cmap, norm
@@ -120,8 +122,9 @@ def make_patches(xdata, ydata, zdata, cmap_name='viridis'):
 
 def _make_time_labels(delta_seconds, nlab=5):
     """Make n time-formatted labels for data in seconds."""
-    label_pos = np.linspace(min(delta_seconds), max(delta_seconds),
-                            nlab, dtype=np.int_)
+    label_pos = np.linspace(
+        min(delta_seconds), max(delta_seconds), nlab, dtype=np.int_
+    )
     label_lab = format_time_delta(label_pos)
     return label_pos, label_lab
 
@@ -149,20 +152,20 @@ def set_up_figure(track):
     fig, ax1 = plt.subplots(constrained_layout=True)
     track_name, track_type = None, None
     try:
-        track_name = track['name'][0]
+        track_name = track["name"][0]
     except (IndexError, KeyError):
         track_name = None
 
     try:
-        track_type = track['type'][0]
+        track_type = track["type"][0]
     except (IndexError, KeyError):
         track_type = None
 
     if track_name is not None:
         if track_type is None:
-            ax1.set_title(f'{track_name}')
+            ax1.set_title(f"{track_name}")
         else:
-            ax1.set_title(f'{track_name}: {track_type}')
+            ax1.set_title(f"{track_name}: {track_type}")
     return fig, ax1
 
 
@@ -187,31 +190,28 @@ def add_regions(axi, xdata, ydata, regions, cut):
     legends, handles = [], []
     if cut is None:
         for i in regions:
-            xpos = xdata[i[0]:i[1]+1]
-            ypos = ydata[i[0]:i[1]+1]
-            axi.fill_between(xpos, min(ydata), ypos, alpha=1.0,
-                             color=ZONE_COLORS_0[i[2]])
+            xpos = xdata[i[0] : i[1] + 1]
+            ypos = ydata[i[0] : i[1] + 1]
+            axi.fill_between(
+                xpos, min(ydata), ypos, alpha=1.0, color=ZONE_COLORS_0[i[2]]
+            )
         for i in range(1, 6):
             patch = mpatches.Patch(color=ZONE_COLORS_0[i])
-            legend = f'Zone = {i}'
+            legend = f"Zone = {i}"
             handles.append(patch)
             legends.append(legend)
     else:
         for i in regions:
-            xpos = xdata[i[0]:i[1]+1]
-            ypos = ydata[i[0]:i[1]+1]
+            xpos = xdata[i[0] : i[1] + 1]
+            ypos = ydata[i[0] : i[1] + 1]
             idx = 0 if i[2] <= cut else 1
             axi.fill_between(
-                xpos,
-                min(ydata),
-                ypos,
-                alpha=1.0,
-                color=ZONE_COLORS[idx]
+                xpos, min(ydata), ypos, alpha=1.0, color=ZONE_COLORS[idx]
             )
         handles.append(mpatches.Patch(color=ZONE_COLORS[0]))
-        legends.append(fr'Zone $\leq$ {cut}')
+        legends.append(rf"Zone $\leq$ {cut}")
         handles.append(mpatches.Patch(color=ZONE_COLORS[1]))
-        legends.append(f'Zone > {cut}')
+        legends.append(f"Zone > {cut}")
     axi.legend(handles, legends)
 
 
@@ -236,10 +236,7 @@ def _get_data(data, key):
     try:
         kdata = data[key]
     except KeyError as error:
-        msg = (
-            f'Requested "{key}" not found in data!'
-            f'\nValid: {data.keys()}'
-        )
+        msg = f'Requested "{key}" not found in data!' f"\nValid: {data.keys()}"
         raise Exception(msg) from error
     return kdata
 
@@ -255,7 +252,7 @@ def _keys_are_present(data, *keys):
     return all_good
 
 
-def add_segmented_line(xdata, ydata, zdata, cmap_name='viridis'):
+def add_segmented_line(xdata, ydata, zdata, cmap_name="viridis"):
     """Create multicolored line.
 
     Create a multicolored line, colored according to the provided
@@ -290,7 +287,7 @@ def add_segmented_line(xdata, ydata, zdata, cmap_name='viridis'):
     return lines
 
 
-def _update_limits(axi, data, which='x', factor=0.025):
+def _update_limits(axi, data, which="x", factor=0.025):
     """Update limits for axes (x or y).
 
     This method will lengthen the given axes.
@@ -308,11 +305,11 @@ def _update_limits(axi, data, which='x', factor=0.025):
 
     """
     length = abs(data.max() - data.min())
-    if which == 'x':
+    if which == "x":
         axi.set_xlim(
             data.min() - length * factor, data.max() + length * factor
         )
-    elif which == 'y':
+    elif which == "y":
         axi.set_ylim(
             data.min() - length * factor, data.max() + length * factor
         )
@@ -320,7 +317,7 @@ def _update_limits(axi, data, which='x', factor=0.025):
         pass
 
 
-def _add_elapsed_labels(axi, data, which='x'):
+def _add_elapsed_labels(axi, data, which="x"):
     """Add nicer labels for time-difference.
 
     Convert elapsed time in seconds to hours:minutes:seconds.
@@ -336,17 +333,17 @@ def _add_elapsed_labels(axi, data, which='x'):
 
     """
     label_pos, label_lab = _make_time_labels(data, 5)
-    if which == 'x':
+    if which == "x":
         axi.set_xticks(label_pos)
         axi.set_xticklabels(label_lab, rotation=25)
-        axi.set_xlabel('Time')
-    elif which == 'y':
+        axi.set_xlabel("Time")
+    elif which == "y":
         axi.set_yticks(label_pos)
         axi.set_yticklabels(label_lab)
-        axi.set_ylabel('Time')
+        axi.set_ylabel("Time")
 
 
-def _shift_elapsed_labels(axi, start_time, which='x'):
+def _shift_elapsed_labels(axi, start_time, which="x"):
     """Shift elapsed labels with a given time origin.
 
     Make a time difference start at a given time.
@@ -361,18 +358,18 @@ def _shift_elapsed_labels(axi, start_time, which='x'):
         Selects the axes (x or y) we are updating.
 
     """
-    if which == 'x':
+    if which == "x":
         ticks = axi.get_xticks()
-    elif which == 'y':
+    elif which == "y":
         ticks = axi.get_yticks()
     else:
         ticks = []
     seconds = [datetime.timedelta(seconds=int(i)) for i in ticks]
     time = [start_time + i for i in seconds]
-    time_lab = [i.strftime('%H:%M:%S') for i in time]
-    if which == 'x':
+    time_lab = [i.strftime("%H:%M:%S") for i in time]
+    if which == "x":
         axi.set_xticklabels(time_lab)
-    elif which == 'y':
+    elif which == "y":
         axi.set_yticklabels(time_lab)
 
 
@@ -394,18 +391,18 @@ def _update_time_ticklabels(axi, xvar, yvar, xdata, ydata):
 
     """
     fmt = mdates.DateFormatter("%H:%M:%S")
-    if xvar == 'elapsed-time':
-        _add_elapsed_labels(axi, xdata, which='x')
-    elif xvar in ('time',):
+    if xvar == "elapsed-time":
+        _add_elapsed_labels(axi, xdata, which="x")
+    elif xvar in ("time",):
         axi.xaxis.set_major_formatter(fmt)
-        axi.tick_params(axis='x', rotation=25)
-    if yvar == 'elapsed-time':
-        _add_elapsed_labels(axi, ydata, which='y')
-    elif yvar in ('time',):
+        axi.tick_params(axis="x", rotation=25)
+    if yvar == "elapsed-time":
+        _add_elapsed_labels(axi, ydata, which="y")
+    elif yvar in ("time",):
         axi.yaxis.set_major_formatter(fmt)
 
 
-def fix_elapsed_time(axi, var, data_axes, data_plot, which='x'):
+def fix_elapsed_time(axi, var, data_axes, data_plot, which="x"):
     """For labels for time when elapsed time is used in plotting.
 
     For coloring plots, the elapsed time data is used for making lines
@@ -426,14 +423,21 @@ def fix_elapsed_time(axi, var, data_axes, data_plot, which='x'):
         Selects the axes (x or y) we are updating.
 
     """
-    if var in ('time', 'elapsed-time'):
+    if var in ("time", "elapsed-time"):
         _add_elapsed_labels(axi, data_plot, which=which)
-        if var == 'time':
+        if var == "time":
             _shift_elapsed_labels(axi, data_axes[0], which=which)
 
 
-def plot_line(track, data, xvar='distance', yvar='elevation', zvar=None,
-              cmap='viridis', **kwargs):
+def plot_line(
+    track,
+    data,
+    xvar="distance",
+    yvar="elevation",
+    zvar=None,
+    cmap="viridis",
+    **kwargs,
+):
     """Plot line data from a segment.
 
     Plot a given segment from a track as a line. The line
@@ -477,25 +481,33 @@ def plot_line(track, data, xvar='distance', yvar='elevation', zvar=None,
     else:
         zdata = _get_data(data, zvar)
         # For time, use the elapsed-time for making the segmented line
-        if xvar in ('time',):
-            xdata = _get_data(data, 'elapsed-time')
-        if yvar in ('time',):
-            ydata = _get_data(data, 'elapsed-time')
+        if xvar in ("time",):
+            xdata = _get_data(data, "elapsed-time")
+        if yvar in ("time",):
+            ydata = _get_data(data, "elapsed-time")
         lines = add_segmented_line(xdata, ydata, zdata, cmap_name=cmap)
-        lines.set_linewidth(kwargs.get('lw', 3))
+        lines.set_linewidth(kwargs.get("lw", 3))
         line = ax1.add_collection(lines)
-        _update_limits(ax1, xdata, which='x')
-        _update_limits(ax1, ydata, which='y')
+        _update_limits(ax1, xdata, which="x")
+        _update_limits(ax1, ydata, which="y")
         cbar = fig.colorbar(line, ax=ax1)
         cbar.set_label(RELABEL.get(zvar, zvar))
         # Shift back for time:
-        fix_elapsed_time(ax1, xvar, _get_data(data, xvar), xdata, which='x')
-        fix_elapsed_time(ax1, yvar, _get_data(data, yvar), ydata, which='y')
+        fix_elapsed_time(ax1, xvar, _get_data(data, xvar), xdata, which="x")
+        fix_elapsed_time(ax1, yvar, _get_data(data, yvar), ydata, which="y")
     return fig, ax1
 
 
-def plot_filled(track, data, xvar='distance', yvar='elevation', zvar='hr',
-                cmap='viridis', cut=None, **kwargs):
+def plot_filled(
+    track,
+    data,
+    xvar="distance",
+    yvar="elevation",
+    zvar="hr",
+    cmap="viridis",
+    cut=None,
+    **kwargs,
+):
     """Plot a filled graph (line with colored area).
 
     Plot a line and fill the area under it, given a specified variable.
@@ -538,15 +550,15 @@ def plot_filled(track, data, xvar='distance', yvar='elevation', zvar='hr',
     ax1.set(xlabel=RELABEL.get(xvar, xvar), ylabel=RELABEL.get(yvar, yvar))
     ax1.plot(xdata, ydata, **kwargs)
 
-    if zvar == 'hr-regions':
+    if zvar == "hr-regions":
         add_regions(ax1, xdata, ydata, data[zvar], cut)
         _update_time_ticklabels(ax1, xvar, yvar, xdata, ydata)
     else:
         # For time, use the elapsed-time for making the filled plot
-        if xvar in ('time',):
-            xdata = _get_data(data, 'elapsed-time')
-        if yvar in ('time',):
-            ydata = _get_data(data, 'elapsed-time')
+        if xvar in ("time",):
+            xdata = _get_data(data, "elapsed-time")
+        if yvar in ("time",):
+            ydata = _get_data(data, "elapsed-time")
         poly, _, _ = make_patches(
             xdata,
             ydata,
@@ -554,11 +566,11 @@ def plot_filled(track, data, xvar='distance', yvar='elevation', zvar='hr',
             cmap_name=cmap,
         )
         col = ax1.add_collection(poly)
-        _update_limits(ax1, xdata, which='x')
-        _update_limits(ax1, ydata, which='y')
+        _update_limits(ax1, xdata, which="x")
+        _update_limits(ax1, ydata, which="y")
         cbar = fig.colorbar(col, ax=ax1)
         cbar.set_label(RELABEL.get(zvar, zvar))
         # Shift labels for time:
-        fix_elapsed_time(ax1, xvar, _get_data(data, xvar), xdata, which='x')
-        fix_elapsed_time(ax1, yvar, _get_data(data, yvar), ydata, which='y')
+        fix_elapsed_time(ax1, xvar, _get_data(data, xvar), xdata, which="x")
+        fix_elapsed_time(ax1, yvar, _get_data(data, yvar), ydata, which="y")
     return fig, ax1

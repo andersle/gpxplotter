@@ -2,6 +2,7 @@
 # Distributed under the LGPLv2.1+ License. See LICENSE for more info.
 """This module defines common methods for gpxplotter."""
 import warnings
+
 import numpy as np
 from sklearn.cluster import KMeans
 
@@ -10,15 +11,15 @@ HR_LIMITS = [(0.5, 0.6), (0.6, 0.7), (0.7, 0.8), (0.8, 0.9), (0.9, 1.0)]
 
 # For adding text:
 RELABEL = {
-    'hr': 'Heart rate / bpm',
-    'distance': 'Distance / m',
-    'time': 'Time',
-    'elapsed-time': 'Elapsed time',
-    'elevation': 'Elevation / m',
-    'hr-zone-frac': 'Fraction of maximum heart rate',
-    'hr-zone-float': 'Heart rate zone',
-    'hr-zone': 'Heart rate zone',
-    'velocity-level': 'Velocity (slower -> faster)',
+    "hr": "Heart rate / bpm",
+    "distance": "Distance / m",
+    "time": "Time",
+    "elapsed-time": "Elapsed time",
+    "elevation": "Elevation / m",
+    "hr-zone-frac": "Fraction of maximum heart rate",
+    "hr-zone-float": "Heart rate zone",
+    "hr-zone": "Heart rate zone",
+    "velocity-level": "Velocity (slower -> faster)",
 }
 
 
@@ -65,7 +66,7 @@ def format_time_delta(time_delta):
     for i in time_delta:
         hours, res = divmod(i, 3600)
         minutes, seconds = divmod(res, 60)
-        timel.append(f'{int(hours):02d}:{int(minutes):02d}:{int(seconds):02d}')
+        timel.append(f"{int(hours):02d}:{int(minutes):02d}:{int(seconds):02d}")
     return timel
 
 
@@ -103,7 +104,7 @@ def find_regions(yval):
         if i == 0:
             reg = [0, region[0], region[1]]
         else:
-            reg = [regions[i-1][0], region[0], region[1]]
+            reg = [regions[i - 1][0], region[0], region[1]]
         new_regions.append(reg)
     return new_regions
 
@@ -119,14 +120,14 @@ def update_hr_zones(segment, max_heart_rate=187):
         The maximum heart rate, used for the calculation of zones.
 
     """
-    if 'hr' in segment:
+    if "hr" in segment:
         limits = heart_rate_zone_limits(max_heart_rate=max_heart_rate)
         bins = [i[0] for i in limits]
         # bins[i-1] <= x < bins[i]
-        segment['hr-zone'] = np.digitize(segment['hr'], bins, right=False)
+        segment["hr-zone"] = np.digitize(segment["hr"], bins, right=False)
         # Add fractional part:
         zone_float = []
-        for hrate, zone in zip(segment['hr'], segment['hr-zone']):
+        for hrate, zone in zip(segment["hr"], segment["hr-zone"]):
             if zone == 0:
                 left = 0
                 right = bins[0]
@@ -134,14 +135,14 @@ def update_hr_zones(segment, max_heart_rate=187):
                 left = bins[-1]
                 right = max_heart_rate
             else:
-                left = bins[zone-1]
+                left = bins[zone - 1]
                 right = bins[zone]
             frac = (hrate - left) / (right - left)
             zone_float.append(zone + frac)
-        segment['hr-zone-float'] = np.array(zone_float)
-        segment['hr-zone-frac'] = segment['hr'] / max_heart_rate
-        segment['hr-regions'] = find_regions(segment['hr-zone'])
-        segment['zone_txt'] = get_limits_txt(limits)
+        segment["hr-zone-float"] = np.array(zone_float)
+        segment["hr-zone-frac"] = segment["hr"] / max_heart_rate
+        segment["hr-regions"] = find_regions(segment["hr-zone"])
+        segment["zone_txt"] = get_limits_txt(limits)
 
 
 def get_limits_txt(limits):
@@ -158,12 +159,12 @@ def get_limits_txt(limits):
 
     """
     txt = {
-        0: f'$<${int(limits[0][0])} bpm',
-        1: f'{int(limits[0][0])}‒{int(limits[0][1])} bpm',
-        2: f'{int(limits[1][0])}‒{int(limits[1][1])} bpm',
-        3: f'{int(limits[2][0])}‒{int(limits[2][1])} bpm',
-        4: f'{int(limits[3][0])}‒{int(limits[3][1])} bpm',
-        5: f'$>${int(limits[3][1])} bpm',
+        0: f"$<${int(limits[0][0])} bpm",
+        1: f"{int(limits[0][0])}‒{int(limits[0][1])} bpm",
+        2: f"{int(limits[1][0])}‒{int(limits[1][1])} bpm",
+        3: f"{int(limits[2][0])}‒{int(limits[2][1])} bpm",
+        4: f"{int(limits[3][0])}‒{int(limits[3][1])} bpm",
+        5: f"$>${int(limits[3][1])} bpm",
     }
     return txt
 
@@ -187,10 +188,10 @@ def cluster_velocities(velocities, n_clusters=5):
 
     """
     if np.isnan(velocities).any():
-        warnings.warn('Some velocities are NaN, skipping clustering')
+        warnings.warn("Some velocities are NaN, skipping clustering")
         return None
     vel = np.array(velocities).reshape(-1, 1)
-    clu = KMeans(n_clusters=n_clusters, init='k-means++', n_init=10)
+    clu = KMeans(n_clusters=n_clusters, init="k-means++", n_init=10)
     labels = clu.fit_predict(vel)
     # Sort labels according to cluster centers so that a lower label
     # is a lower velocity:
