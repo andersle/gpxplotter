@@ -7,29 +7,31 @@ Adding overlays
 This example will create a map, add a track and some
 overlays that will display the steepness.
 """
+import folium
 from branca.element import MacroElement
 from jinja2 import Template
-import folium
+
 from gpxplotter import (
+    add_segment_to_map,
     create_folium_map,
     read_gpx_file,
-    add_segment_to_map,
 )
-line_options = {'weight': 8}
 
-the_map = create_folium_map(tiles='kartverket_topo4')
+line_options = {"weight": 8}
 
-for track in read_gpx_file('example3.gpx'):
-    for i, segment in enumerate(track['segments']):
+the_map = create_folium_map(tiles="kartverket_topo4")
+
+for track in read_gpx_file("example3.gpx"):
+    for i, segment in enumerate(track["segments"]):
         add_segment_to_map(the_map, segment, line_options=line_options)
 
 steepness = folium.WmsTileLayer(
-    url='https://nve.geodataonline.no/arcgis/services/Bratthet/MapServer/WmsServer?',
-    layers='Bratthet_snoskred',
-    fmt='image/png',
+    url="https://nve.geodataonline.no/arcgis/services/Bratthet/MapServer/WmsServer?",
+    layers="Bratthet_snoskred",
+    fmt="image/png",
     opacity=0.7,
     transparent=True,
-    name='Steepness',
+    name="Steepness",
 )
 steepness.add_to(the_map)
 
@@ -37,7 +39,9 @@ steepness.add_to(the_map)
 # Add some custom code to show a legend:
 class Legend(MacroElement):
     """Just add a hard-coded legend template."""
-    _template = Template(u"""
+
+    _template = Template(
+        """
         {% macro header(this,kwargs) %}
             <style>
                 .info {
@@ -85,7 +89,8 @@ class Legend(MacroElement):
             };
             legend.addTo({{ this._parent.get_name() }});
         {% endmacro %}
-        """)
+        """
+    )
 
 
 the_map.add_child(Legend())

@@ -7,10 +7,11 @@ Simple plot with matplotlib (2)
 This example will combine some information into a single
 plot with matplotlib.
 """
-from matplotlib import pyplot as plt
-from gpxplotter import read_gpx_file
 import numpy as np
 import seaborn as sns
+from matplotlib import pyplot as plt
+
+from gpxplotter import read_gpx_file
 
 sns.set_context("notebook")
 

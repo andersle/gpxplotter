@@ -8,16 +8,16 @@ This example will create a map and add a heart rate heat map along
 a track.
 """
 from folium.plugins import HeatMap
-from gpxplotter import read_gpx_file, create_folium_map
 
+from gpxplotter import create_folium_map, read_gpx_file
 
-the_map = create_folium_map(tiles='openstreetmap')
-for track in read_gpx_file('example4.gpx'):
-    for i, segment in enumerate(track['segments']):
+the_map = create_folium_map(tiles="openstreetmap")
+for track in read_gpx_file("example4.gpx"):
+    for i, segment in enumerate(track["segments"]):
         data = []
-        for lat, lon, hr in zip(segment['lat'], segment['lon'], segment['hr']):
+        for lat, lon, hr in zip(segment["lat"], segment["lon"], segment["hr"]):
             data.append([lat, lon, float(hr)])
-        HeatMap(data, name='Heart rate', radius=20).add_to(the_map)
+        HeatMap(data, name="Heart rate", radius=20).add_to(the_map)
         boundary = the_map.get_bounds()
         the_map.fit_bounds(boundary, padding=(3, 3))
         break

@@ -11,9 +11,10 @@ according to the velocity.
 .. note:: The velocities are calculated from the distance
    so it is a bit noisy.
 """
-from matplotlib import pyplot as plt
-from gpxplotter import read_gpx_file, plot_filled
 import seaborn as sns
+from matplotlib import pyplot as plt
+
+from gpxplotter import plot_filled, read_gpx_file
 
 sns.set_context("notebook")
 
