@@ -6,14 +6,14 @@ Display a segment in a map
 
 This example will create a map and add a track to it.
 """
-from gpxplotter import read_gpx_file, create_folium_map, add_segment_to_map
+from gpxplotter import add_segment_to_map, create_folium_map, read_gpx_file
 
 # Define some properties for drawing the line:
-line_options = {'color': 'red', 'weight': 8, 'opacity': 0.5}
+line_options = {"color": "red", "weight": 8, "opacity": 0.5}
 
-the_map = create_folium_map(tiles='kartverket_topo4')
-for track in read_gpx_file('example1.gpx'):
-    for i, segment in enumerate(track['segments']):
+the_map = create_folium_map(tiles="kartverket_topo4")
+for track in read_gpx_file("example1.gpx"):
+    for i, segment in enumerate(track["segments"]):
         add_segment_to_map(the_map, segment, line_options=line_options)
 
 # To store the map as a HTML page:

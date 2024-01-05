@@ -8,9 +8,10 @@ This example will use the plotting methods of
 gpxplotter to plot the elevation as a
 function of distance and elapsed time.
 """
-from matplotlib import pyplot as plt
-from gpxplotter import read_gpx_file, plot_line
 import seaborn as sns
+from matplotlib import pyplot as plt
+
+from gpxplotter import plot_line, read_gpx_file
 
 sns.set_context("notebook")
 

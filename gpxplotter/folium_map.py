@@ -13,7 +13,7 @@ TILES = {
             "http://opencache.statkart.no/gatekeeper/gk/gk.open_gmaps?"
             "layers=topo4&zoom={z}&x={x}&y={y}"
         ),
-        "attr": ('<a href="http://www.kartverket.no/">Kartverket</a>',),
+        "attr": '<a href="http://www.kartverket.no/">Kartverket</a>',
     },
     "kartverket_topo4graatone": {
         "name": "Kartverket (topo4graatone)",
@@ -21,7 +21,7 @@ TILES = {
             "http://opencache.statkart.no/gatekeeper/gk/gk.open_gmaps?"
             "layers=topo4graatone&zoom={z}&x={x}&y={y}"
         ),
-        "attr": ('<a href="http://www.kartverket.no/">Kartverket</a>',),
+        "attr": '<a href="http://www.kartverket.no/">Kartverket</a>',
     },
     "opentopomap": {
         "name": "OpenTopoMap",
@@ -92,7 +92,11 @@ TILES = {
 }
 
 
-_FOLIUM_TILES = ("openstreetmap", "stamenterrain")
+_FOLIUM_TILES = (
+    "openstreetmap",
+    "cartodb positron",
+    "cartodb voyager",
+)
 
 
 def create_folium_map(**kwargs):
@@ -102,7 +106,8 @@ def create_folium_map(**kwargs):
     ``folium.Map(**kwargs)``, with a few differences:
 
     * ``control_scale = True`` by default.
-    * ``tiles`` can be ``"openstreetmap"`` or ``"stamenterrain"`` or
+    * ``tiles`` can be ``"openstreetmap"``,
+      ``"cartodb positron"``, ``"cartodb voyager"``, or
       any of the tiles defined in :py:const:`.TILES`.
 
     Parameters
@@ -323,7 +328,9 @@ def add_colored_line(
         linmap = cmap
     else:
         raise Exception(
-            "Color map can be either a name of a linear map from branca.coloramp package, or a branca.colormap.ColorMap instance."
+            "Color map can be either a name of a linear map from "
+            "branca.coloramp package, or a branca.colormap.ColorMap "
+            "instance."
         )
 
     colormap = linmap.scale(minz, maxz).to_step(levels)

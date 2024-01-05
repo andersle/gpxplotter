@@ -7,10 +7,11 @@ Simple plot with matplotlib
 This example will just plot the distance as a function
 of time.
 """
-from matplotlib import pyplot as plt
 import matplotlib.dates as mdates
-from gpxplotter import read_gpx_file
 import seaborn as sns
+from matplotlib import pyplot as plt
+
+from gpxplotter import read_gpx_file
 
 sns.set_context("notebook")
 

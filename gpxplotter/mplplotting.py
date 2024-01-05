@@ -9,9 +9,8 @@ import matplotlib.dates as mdates
 import matplotlib.patches as mpatches
 import numpy as np
 from matplotlib import pyplot as plt
-from matplotlib.cm import get_cmap
 from matplotlib.collections import LineCollection, PolyCollection
-from matplotlib.colors import BoundaryNorm, Normalize
+from matplotlib.colors import BoundaryNorm, LinearSegmentedColormap, Normalize
 
 from gpxplotter.common import RELABEL, format_time_delta
 
@@ -55,10 +54,14 @@ def _select_cmap(zdata, cmap_name):
     """
     uniqz = len(set(zdata))
     if uniqz > 10:
-        cmap = get_cmap(cmap_name)
+        cmap = plt.colormaps.get_cmap(cmap_name)
         norm = Normalize(vmin=floor(min(zdata)), vmax=ceil(max(zdata)))
     else:
-        cmap = get_cmap(cmap_name, lut=uniqz)
+        base_cmap = plt.colormaps.get_cmap(cmap_name)
+        new_colors = base_cmap(np.linspace(0, 1, uniqz))
+        cmap = LinearSegmentedColormap.from_list(
+            f"{cmap_name}_{uniqz}", new_colors, N=uniqz
+        )
         boundaries = list(sorted(set(zdata)))
         boundaries = boundaries + [max(boundaries) + 1]
         norm = BoundaryNorm(boundaries, uniqz, clip=True)

@@ -8,12 +8,12 @@ This example will use the calculated heart rate zones from
 gpxplotter to show the fraction of time spent in the different
 zones.
 """
-from matplotlib import pyplot as plt
-from matplotlib.cm import get_cmap
-from gpxplotter import read_gpx_file
-from gpxplotter.common import format_time_delta
 import numpy as np
 import seaborn as sns
+from matplotlib import pyplot as plt
+
+from gpxplotter import read_gpx_file
+from gpxplotter.common import format_time_delta
 
 sns.set_context("notebook")
 
@@ -45,7 +45,7 @@ for track in read_gpx_file("example4.gpx", max_heart_rate=MAX_HEART_RATE):
         ]
         values = [time_in_zones[i] for i in zones]
         times = format_time_delta(values)
-        cmap = get_cmap(name="Reds")
+        cmap = plt.colormaps.get_cmap("Reds")
         colors = cmap(np.linspace(0, 1, len(zones) + 1))
         colors = colors[1:]  # Skip the first color
         fig, ax1 = plt.subplots(constrained_layout=True)

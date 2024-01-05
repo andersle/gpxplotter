@@ -9,11 +9,12 @@ This example will inspect the calculated velocities.
 .. note:: The velocities are calculated from the distance
    so it is a bit noisy.
 """
-from matplotlib import pyplot as plt
 import matplotlib.dates as mdates
-from gpxplotter import read_gpx_file, plot_filled
-from gpxplotter.common import cluster_velocities
 import seaborn as sns
+from matplotlib import pyplot as plt
+
+from gpxplotter import plot_filled, read_gpx_file
+from gpxplotter.common import cluster_velocities
 
 sns.set_context("notebook")
 
@@ -40,7 +41,7 @@ for track in read_gpx_file("example1.gpx"):
         )
         axj.legend(
             *scatter.legend_elements(num=len(set(level))),
-            title="Velocity level"
+            title="Velocity level",
         )
         axj.xaxis.set_major_formatter(mdates.DateFormatter("%H:%M:%S"))
         axj.tick_params(axis="x", rotation=25)
